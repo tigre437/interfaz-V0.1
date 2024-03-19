@@ -1,0 +1,4 @@
+#Ignoro las librerias
+interfaz/Lib/
+interfaz/Include/
+interfaz/Scripts/

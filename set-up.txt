@@ -1,0 +1,10 @@
+Si no te deja crear el entorno virtual entra en la powershell y ejecuta esto: Set-ExecutionPolicy Unrestricted   , una vez ejecutado escribe 'S'
+
+Para poder correr el proyecto necesitaremos varias librerias
+
+
+pip install pyside6
+
+pip install pyqt6-tools
+
+pip install opencv-python
