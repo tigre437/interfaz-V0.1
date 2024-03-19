@@ -8,3 +8,5 @@ pip install pyside6
 pip install pyqt6-tools
 
 pip install opencv-python
+
+pip install pyserial

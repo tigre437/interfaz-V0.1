@@ -45,33 +45,38 @@ class App(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Qt live label demo")
-        self.disply_width = 640/2
-        self.display_height = 480/2
-        # create the label that holds the image
+        self.resize(800, 600)
+        self.disply_width = self.width() // 2
+        self.display_height = self.height() // 2
+        
+        # Crear el QLabel para la imagen
         self.image_label = QLabel(self)
         self.image_label.resize(self.disply_width, self.display_height)
-        # create buttons
+
+        # Crear botones
         self.settingsBTN = QPushButton("settings")
         self.saveBTN = QPushButton("save")
         
-        # create a vertical box layout and add the two labels
+        # Crear un diseño vertical y agregar los elementos
         vbox = QVBoxLayout()
         vbox.addWidget(self.image_label)
         vbox.addWidget(self.settingsBTN)
         vbox.addWidget(self.saveBTN)
-        # set the vbox layout as the widgets layout
         self.setLayout(vbox)
 
-        # create the video capture thread
+        # Crear el hilo de captura de video
         self.thread = VideoThread()
-        # connect its signal to the update_image slot
         self.thread.change_pixmap_signal.connect(self.update_image)
-        # connect the button to clickebutton function
         self.settingsBTN.clicked.connect(self.settings)
         self.saveBTN.clicked.connect(self.save)
-
-        # start the thread
         self.thread.start()
+
+    def resizeEvent(self, event):
+        # Redimensionar y mover el QLabel cuando la ventana cambie de tamaño
+        self.disply_width = self.width() // 2
+        self.display_height = self.height() // 2
+        self.image_label.resize(self.disply_width, self.display_height)
+        #self.image_label.move(self.disply_width // 2, self.display_height // 2)
 
     def settings(self):
         self.thread.settings()
@@ -79,31 +84,30 @@ class App(QWidget):
     def save(self):
         self.thread.save()
 
-
-
     def closeEvent(self, event):
         self.thread.stop()
         event.accept()
 
-
-
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
-        """Updates the image_label with a new opencv image"""
+        """Actualiza el QLabel con una nueva imagen de OpenCV"""
         qt_img = self.convert_cv_qt(cv_img)
         self.image_label.setPixmap(qt_img)
-    
+
     def convert_cv_qt(self, cv_img):
-        """Convert from an opencv image to QPixmap"""
+        """Convierte una imagen de OpenCV a QPixmap"""
         rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb_image.shape
         bytes_per_line = ch * w
         convert_to_Qt_format = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format.Format_RGB888)
         p = convert_to_Qt_format.scaled(self.disply_width, self.display_height, Qt.AspectRatioMode.KeepAspectRatio)
         return QPixmap.fromImage(p)
+ 
+
     
 if __name__=="__main__":
     app = QApplication(sys.argv)
     a = App()
     a.show()
+    print(a.size().width())
     sys.exit(app.exec())
