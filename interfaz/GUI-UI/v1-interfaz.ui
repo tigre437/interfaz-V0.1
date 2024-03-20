@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1417</width>
-    <height>934</height>
+    <width>675</width>
+    <height>925</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
      </size>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tabAjustes">
      <attribute name="title">
@@ -2429,7 +2429,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>500</y>
+              <y>390</y>
               <width>431</width>
               <height>22</height>
              </rect>
@@ -2439,9 +2439,9 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>550</y>
+              <y>430</y>
               <width>431</width>
-              <height>291</height>
+              <height>411</height>
              </rect>
             </property>
             <property name="title">
@@ -2583,7 +2583,7 @@
              <property name="geometry">
               <rect>
                <x>70</x>
-               <y>220</y>
+               <y>310</y>
                <width>75</width>
                <height>24</height>
               </rect>
@@ -2595,8 +2595,8 @@
             <widget class="QPushButton" name="pushButton_13">
              <property name="geometry">
               <rect>
-               <x>240</x>
-               <y>220</y>
+               <x>250</x>
+               <y>310</y>
                <width>75</width>
                <height>24</height>
               </rect>
@@ -2609,7 +2609,7 @@
              <property name="geometry">
               <rect>
                <x>70</x>
-               <y>250</y>
+               <y>350</y>
                <width>71</width>
                <height>22</height>
               </rect>
@@ -2618,8 +2618,8 @@
             <widget class="QPushButton" name="pushButton_14">
              <property name="geometry">
               <rect>
-               <x>234</x>
-               <y>250</y>
+               <x>240</x>
+               <y>350</y>
                <width>101</width>
                <height>24</height>
               </rect>
