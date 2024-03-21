@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1355</width>
-    <height>873</height>
+    <height>821</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -2478,19 +2478,19 @@
         <x>400</x>
         <y>10</y>
         <width>366</width>
-        <height>780</height>
+        <height>744</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
         <width>366</width>
-        <height>780</height>
+        <height>744</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>366</width>
-        <height>779</height>
+        <height>745</height>
        </size>
       </property>
       <property name="frameShape">
@@ -2560,23 +2560,46 @@
              </property>
              <item>
               <widget class="QLabel" name="label_66">
+               <property name="maximumSize">
+                <size>
+                 <width>47</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="text">
                 <string>Imagen: </string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit_37"/>
+              <widget class="QLabel" name="label_71">
+               <property name="text">
+                <string>20240321_prueba_111101011</string>
+               </property>
+              </widget>
              </item>
              <item>
               <widget class="QLabel" name="label_67">
+               <property name="maximumSize">
+                <size>
+                 <width>39</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="text">
                 <string>| Temp: </string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit_38"/>
+              <widget class="QLineEdit" name="lineEdit_38">
+               <property name="maximumSize">
+                <size>
+                 <width>45</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -2661,240 +2684,6 @@
              </item>
              <item>
               <widget class="QLineEdit" name="lineEdit_40"/>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QFrame" name="frame_58">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>210</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>240</height>
-          </size>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_18">
-          <item>
-           <widget class="QFrame" name="frame_59">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_68">
-             <item>
-              <widget class="QLabel" name="label_71">
-               <property name="text">
-                <string>Radio Min. :</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSlider" name="horizontalSlider_12">
-               <property name="maximumSize">
-                <size>
-                 <width>130</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_12">
-               <property name="maximumSize">
-                <size>
-                 <width>50</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QFrame" name="frame_60">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_69">
-             <item>
-              <widget class="QLabel" name="label_72">
-               <property name="text">
-                <string>Radio Max. :</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSlider" name="horizontalSlider_13">
-               <property name="maximumSize">
-                <size>
-                 <width>130</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_13">
-               <property name="maximumSize">
-                <size>
-                 <width>50</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QFrame" name="frame_61">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_70">
-             <item>
-              <widget class="QLabel" name="label_73">
-               <property name="text">
-                <string>Convexidad:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSlider" name="horizontalSlider_14">
-               <property name="maximumSize">
-                <size>
-                 <width>130</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_14">
-               <property name="maximumSize">
-                <size>
-                 <width>50</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QFrame" name="frame_62">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_71">
-             <item>
-              <widget class="QLabel" name="label_74">
-               <property name="text">
-                <string>Grado Polin. :</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSlider" name="horizontalSlider_15">
-               <property name="maximumSize">
-                <size>
-                 <width>130</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_15">
-               <property name="maximumSize">
-                <size>
-                 <width>50</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QFrame" name="frame_63">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_72">
-             <item>
-              <widget class="QLabel" name="label_75">
-               <property name="text">
-                <string>Umbral:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSlider" name="horizontalSlider_16">
-               <property name="maximumSize">
-                <size>
-                 <width>130</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_16">
-               <property name="maximumSize">
-                <size>
-                 <width>50</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-              </widget>
              </item>
             </layout>
            </widget>
