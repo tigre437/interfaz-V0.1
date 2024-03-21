@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1355</width>
+    <width>1245</width>
     <height>821</height>
    </rect>
   </property>
@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -102,7 +102,7 @@
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_6">
               <item>
-               <widget class="QComboBox" name="comboBox_2">
+               <widget class="QComboBox" name="comboBoxFiltro">
                 <property name="currentText">
                  <string/>
                 </property>
@@ -140,7 +140,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_14"/>
+                  <widget class="QLineEdit" name="txtNombreFiltro"/>
                  </item>
                 </layout>
                </widget>
@@ -174,7 +174,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_9"/>
+                  <widget class="QLineEdit" name="txtTempStorage"/>
                  </item>
                 </layout>
                </widget>
@@ -208,7 +208,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_11"/>
+                  <widget class="QLineEdit" name="txtIdMuestreador"/>
                  </item>
                 </layout>
                </widget>
@@ -242,7 +242,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_12"/>
+                  <widget class="QLineEdit" name="txtPosFilter"/>
                  </item>
                 </layout>
                </widget>
@@ -276,7 +276,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_13"/>
+                  <widget class="QLineEdit" name="txtAirVol"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_33">
@@ -335,7 +335,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDateTimeEdit" name="dateTimeEdit"/>
+                  <widget class="QDateTimeEdit" name="txtHoraInicio"/>
                  </item>
                 </layout>
                </widget>
@@ -375,7 +375,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDateTimeEdit" name="dateTimeEdit_2"/>
+                  <widget class="QDateTimeEdit" name="txtHoraFin"/>
                  </item>
                 </layout>
                </widget>
@@ -412,7 +412,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPlainTextEdit" name="plainTextEdit">
+                  <widget class="QPlainTextEdit" name="txaObservFiltro">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
@@ -460,7 +460,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_15"/>
+                  <widget class="QLineEdit" name="txtNombreExperimento"/>
                  </item>
                 </layout>
                </widget>
@@ -494,7 +494,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_19"/>
+                  <widget class="QLineEdit" name="txtVDrop"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_40">
@@ -547,7 +547,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_17"/>
+                  <widget class="QLineEdit" name="txtVWash"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_41">
@@ -600,7 +600,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_16"/>
+                  <widget class="QLineEdit" name="txtFactorDiluc"/>
                  </item>
                 </layout>
                </widget>
@@ -634,7 +634,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_18"/>
+                  <widget class="QLineEdit" name="txtFraccFiltro"/>
                  </item>
                 </layout>
                </widget>
@@ -668,7 +668,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_21"/>
+                  <widget class="QLineEdit" name="txtTasaMuestreo"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_43">
@@ -721,7 +721,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_25"/>
+                  <widget class="QLineEdit" name="txtVelEnfriamiento"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_44">
@@ -777,7 +777,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPlainTextEdit" name="plainTextEdit_2">
+                  <widget class="QPlainTextEdit" name="txtObservExperimento">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
@@ -865,7 +865,7 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="tab_3">
              <attribute name="title">
@@ -891,14 +891,14 @@
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="QComboBox" name="comboBox">
+                  <widget class="QComboBox" name="comboBoxCamara">
                    <property name="placeholderText">
                     <string>-- Selecciona una cámara --</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_2">
+                  <widget class="QPushButton" name="buttonConectar">
                    <property name="maximumSize">
                     <size>
                      <width>80</width>
@@ -941,7 +941,7 @@
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="QPushButton" name="pushButton_3">
+                  <widget class="QPushButton" name="buttonConfiguracion">
                    <property name="maximumSize">
                     <size>
                      <width>120</width>
@@ -994,7 +994,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QSlider" name="horizontalSlider">
+                        <widget class="QSlider" name="hSliderRadioMin">
                          <property name="maximumSize">
                           <size>
                            <width>130</width>
@@ -1036,7 +1036,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QSlider" name="horizontalSlider_3">
+                        <widget class="QSlider" name="hSliderRadioMax">
                          <property name="maximumSize">
                           <size>
                            <width>130</width>
@@ -1050,48 +1050,6 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
-                         <property name="maximumSize">
-                          <size>
-                           <width>50</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QFrame" name="frame_9">
-                      <property name="frameShape">
-                       <enum>QFrame::StyledPanel</enum>
-                      </property>
-                      <property name="frameShadow">
-                       <enum>QFrame::Raised</enum>
-                      </property>
-                      <layout class="QHBoxLayout" name="horizontalLayout_20">
-                       <item>
-                        <widget class="QLabel" name="label_5">
-                         <property name="text">
-                          <string>Convexidad:</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QSlider" name="horizontalSlider_4">
-                         <property name="maximumSize">
-                          <size>
-                           <width>130</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
                          <property name="maximumSize">
                           <size>
                            <width>50</width>
@@ -1120,7 +1078,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QSlider" name="horizontalSlider_5">
+                        <widget class="QSlider" name="hSliderGradoPolig">
                          <property name="maximumSize">
                           <size>
                            <width>130</width>
@@ -1162,7 +1120,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QSlider" name="horizontalSlider_6">
+                        <widget class="QSlider" name="hSliderUmbral">
                          <property name="maximumSize">
                           <size>
                            <width>130</width>
@@ -1203,21 +1161,21 @@
                       </property>
                       <layout class="QHBoxLayout" name="horizontalLayout_29">
                        <item>
-                        <widget class="QPushButton" name="pushButton_5">
+                        <widget class="QPushButton" name="buttonAceptarParamDetec">
                          <property name="text">
                           <string>Aceptar</string>
                          </property>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QPushButton" name="pushButton_6">
+                        <widget class="QPushButton" name="buttonCancelarParamDetec">
                          <property name="text">
                           <string>Cancelar</string>
                          </property>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QPushButton" name="pushButton_7">
+                        <widget class="QPushButton" name="buttonAplicarParamDetec">
                          <property name="text">
                           <string>Aplicar</string>
                          </property>
@@ -1255,10 +1213,10 @@
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_23">
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_2"/>
+                  <widget class="QLineEdit" name="txtIpTermos"/>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_4">
+                  <widget class="QPushButton" name="buttonConectarTermo">
                    <property name="maximumSize">
                     <size>
                      <width>80</width>
@@ -1305,7 +1263,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QSlider" name="horizontalSlider_7">
+                        <widget class="QSlider" name="hSliderTempMin">
                          <property name="maximumSize">
                           <size>
                            <width>130</width>
@@ -1347,7 +1305,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QSlider" name="horizontalSlider_8">
+                        <widget class="QSlider" name="hSliderTempMax">
                          <property name="maximumSize">
                           <size>
                            <width>130</width>
@@ -1389,7 +1347,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QSlider" name="horizontalSlider_9">
+                        <widget class="QSlider" name="hSliderTempSet">
                          <property name="maximumSize">
                           <size>
                            <width>130</width>
@@ -1403,90 +1361,6 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
-                         <property name="maximumSize">
-                          <size>
-                           <width>50</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QFrame" name="frame_17">
-                      <property name="frameShape">
-                       <enum>QFrame::StyledPanel</enum>
-                      </property>
-                      <property name="frameShadow">
-                       <enum>QFrame::Raised</enum>
-                      </property>
-                      <layout class="QHBoxLayout" name="horizontalLayout_27">
-                       <item>
-                        <widget class="QLabel" name="label_12">
-                         <property name="text">
-                          <string>Param 1. :</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QSlider" name="horizontalSlider_10">
-                         <property name="maximumSize">
-                          <size>
-                           <width>130</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QDoubleSpinBox" name="doubleSpinBox_10">
-                         <property name="maximumSize">
-                          <size>
-                           <width>50</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QFrame" name="frame_18">
-                      <property name="frameShape">
-                       <enum>QFrame::StyledPanel</enum>
-                      </property>
-                      <property name="frameShadow">
-                       <enum>QFrame::Raised</enum>
-                      </property>
-                      <layout class="QHBoxLayout" name="horizontalLayout_28">
-                       <item>
-                        <widget class="QLabel" name="label_19">
-                         <property name="text">
-                          <string>Param 2.:</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QSlider" name="horizontalSlider_11">
-                         <property name="maximumSize">
-                          <size>
-                           <width>130</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QDoubleSpinBox" name="doubleSpinBox_11">
                          <property name="maximumSize">
                           <size>
                            <width>50</width>
@@ -1514,21 +1388,21 @@
                       </property>
                       <layout class="QHBoxLayout" name="horizontalLayout_30">
                        <item>
-                        <widget class="QPushButton" name="pushButton_8">
+                        <widget class="QPushButton" name="buttonAceptarParamTemp">
                          <property name="text">
                           <string>Aceptar</string>
                          </property>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QPushButton" name="pushButton_9">
+                        <widget class="QPushButton" name="buttonCancelarParamTemp">
                          <property name="text">
                           <string>Cancelar</string>
                          </property>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QPushButton" name="pushButton_10">
+                        <widget class="QPushButton" name="buttonAplicarParamTemp">
                          <property name="text">
                           <string>Aplicar</string>
                          </property>
@@ -1551,7 +1425,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_8">
+        <widget class="QLabel" name="labelRampa">
          <property name="minimumSize">
           <size>
            <width>370</width>
@@ -1606,7 +1480,7 @@
         <number>11</number>
        </property>
        <item>
-        <widget class="QLabel" name="label_20">
+        <widget class="QLabel" name="labelCamara">
          <property name="minimumSize">
           <size>
            <width>480</width>
