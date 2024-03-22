@@ -1,5 +1,5 @@
 from PyQt6 import QtWidgets
-from PyQt6.QtWidgets import QMainWindow, QFileDialog
+from PyQt6.QtWidgets import QMainWindow, QFileDialog, QDialog, QLabel, QLineEdit, QPushButton, QVBoxLayout
 from PyQt6.QtCore import QTimer, QThread, pyqtSignal, pyqtSlot, Qt
 from PyQt6.QtGui import QPixmap, QImage, QTransform
 import cv2
@@ -7,6 +7,7 @@ from interfazv1 import Ui_MainWindow
 import serial.tools.list_ports
 import numpy as np
 from pygrabber.dshow_graph import FilterGraph
+import os
 
 
 import time
@@ -29,6 +30,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.checkBoxHabilitarA.stateChanged.connect(self.cambiarPlacaA)
         self.checkBoxHabilitarB.stateChanged.connect(self.cambiarPlacaB)
+
+        self.comboBoxFiltro.currentIndexChanged.connect(self.comprobar_opcion_seleccionada)
         
 
         self.display_width = self.width() // 2
@@ -54,8 +57,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.thread.change_pixmap_signal.connect(self.update_image)
         self.thread.set_camera_index(index)
         self.thread.start()
-
-
 
 
     def get_available_cameras(self) :
@@ -119,21 +120,101 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.txtVelEnfriamientoPlacaB.setEnabled(False)
             self.txtObservPlacaB.setEnabled(False)
 
+#Sistema de busqueda de carpetas SNS
+    def buscar_carpetas_sns(self, directorio):
+            # Obtener una lista de todas las carpetas dentro del directorio proporcionado
+            carpetas = [nombre for nombre in os.listdir(directorio) if os.path.isdir(os.path.join(directorio, nombre))]
+            
+            # Filtrar las carpetas que comienzan por "SNS"
+            carpetas_sns = [carpeta for carpeta in carpetas if carpeta.startswith("SNS")]
 
-
-
-
-
-
+            return carpetas_sns
+#Cargo todos los resultados de la busqueda de los filtros en el combobox de los filtros
     def filechooser(self):
         # Abrir el diálogo de selección de archivos
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.FileMode.Directory)
         
-        # Se selecciona una carpeta y se muestra la ruta
+        # Seleccionar una carpeta y mostrar la ruta
         if file_dialog.exec():
             selected_folder = file_dialog.selectedFiles()
-            self.txtArchivos.setText(selected_folder[0])
+            carpeta_seleccionada = selected_folder[0]
+            self.txtArchivos.setText(carpeta_seleccionada)
+            
+            # Buscar todas las carpetas que comienzan por "SNS" dentro de la carpeta seleccionada
+            carpetas_sns = self.buscar_carpetas_sns(carpeta_seleccionada)
+            
+            if carpetas_sns:
+                # Limpiar el comboBox antes de agregar nuevas carpetas
+                self.comboBoxFiltro.clear()
+                self.comboBoxFiltro.addItem("Crear un filtro nuevo ...")
+                
+                # Agregar las carpetas encontradas al comboBox
+                for carpeta in carpetas_sns:
+                    self.comboBoxFiltro.addItem(carpeta)
+            else:
+                print("No se encontraron carpetas que empiecen por 'SNS' dentro de la carpeta seleccionada.")
+
+    def comprobar_opcion_seleccionada(self, index):
+        if index == 0:  # Si se selecciona la opción de crear una carpeta
+            nombre_carpeta = self.obtener_nombre_carpeta()
+            if nombre_carpeta:
+                self.crear_carpeta(nombre_carpeta)
+
+    def obtener_nombre_carpeta(self):
+        dialogo = QDialog(self)
+        dialogo.setWindowTitle("Nombre de la carpeta")
+        
+        etiqueta = QLabel("Ingrese el nombre de la carpeta:")
+        campo_texto = QLineEdit()
+        boton_aceptar = QPushButton("Aceptar")
+        boton_cancelar = QPushButton("Cancelar")
+
+        layout = QVBoxLayout()
+        layout.addWidget(etiqueta)
+        layout.addWidget(campo_texto)
+        layout.addWidget(boton_aceptar)
+        layout.addWidget(boton_cancelar)
+
+        dialogo.setLayout(layout)
+
+        def aceptar():
+            nombre_carpeta = campo_texto.text()
+            if nombre_carpeta:
+                dialogo.accept()
+
+        boton_aceptar.clicked.connect(aceptar)
+        boton_cancelar.clicked.connect(dialogo.reject)
+
+        if dialogo.exec() == QDialog.DialogCode.Accepted:
+            return campo_texto.text()
+        else:
+            return None
+
+    def crear_carpeta(self, nombre_carpeta):
+        # Obtener la fecha actual
+        fecha_actual = datetime.datetime.now().strftime("%Y%m%d")
+        nombre_carpeta_sns = f"SNS_{fecha_actual}_{nombre_carpeta}"
+        
+        # Obtener la ruta del directorio seleccionado por el usuario
+        directorio_seleccionado = self.txtArchivos.text()
+        
+        # Comprobar si el directorio existe y crear la carpeta si es necesario
+        if os.path.isdir(directorio_seleccionado):
+            ruta_carpeta_sns = os.path.join(directorio_seleccionado, nombre_carpeta_sns)
+            os.makedirs(ruta_carpeta_sns)
+            print(f"Carpeta '{nombre_carpeta_sns}' creada exitosamente en '{directorio_seleccionado}'.")
+            carpetas_sns = self.buscar_carpetas_sns(directorio_seleccionado)
+            self.comboBoxFiltro.clear()
+            self.comboBoxFiltro.addItem("Crear un filtro nuevo ...")
+            
+            # Agregar las carpetas encontradas al comboBox
+            for carpeta in carpetas_sns:
+                self.comboBoxFiltro.addItem(carpeta)
+            self.comboBoxFiltro.setCurrentText(nombre_carpeta_sns)
+        else:
+            print("Error: El directorio seleccionado no es válido.")
+   
 
     def openConfigCamera(self):
         print("en proceso")
