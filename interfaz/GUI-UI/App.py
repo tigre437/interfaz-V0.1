@@ -44,18 +44,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
 
     def update_camera_index(self, index):
-        print(index)
-        """Actualiza el índice del dispositivo de captura cuando se selecciona un nuevo índice en el ComboBox"""
-          # Pasar el índice seleccionado al hilo de vídeo
-        
-        if self.thread.isRunning():
-            self.thread.stop()
-            print("stop")
-            
+        if self.thread and self.thread.isRunning():
+            self.thread.stop()  # Detener el hilo existente
+            self.thread.finished.connect(self.thread.deleteLater)  # Eliminar el objeto del hilo después de que termine
+
+        self.thread = VideoThread()
         self.thread.change_pixmap_signal.connect(self.update_image)
         self.thread.set_camera_index(index)
         self.thread.start()
-        print("START")
+
 
 
 
