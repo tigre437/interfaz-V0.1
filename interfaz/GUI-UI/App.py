@@ -19,7 +19,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.buttonBuscarArchivos.clicked.connect(self.filechooser)
         self.buttonConfiguracion.clicked.connect(self.openConfigCamera)
-        self.buttonConectar.clicked.connect(self.conectarCamara)
         self.thread = VideoThread()
 
         self.fillCameras()
@@ -27,6 +26,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.comboBoxCamara.currentIndexChanged.connect(self.update_camera_index)
         self.buttonConfiguracion.clicked.connect(self.settings)
+
+        self.checkBoxHabilitarA.stateChanged.connect(self.cambiarPlacaA)
+        self.checkBoxHabilitarB.stateChanged.connect(self.cambiarPlacaB)
         
 
         self.display_width = self.width() // 2
@@ -73,12 +75,56 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         for camera_index, camera_name in available_cameras.items():
             self.comboBoxCamara.addItem(camera_name)
 
-    def conectarCamara(self):
-        print(self.comboBoxCamara.currentIndex())
-
     def settings(self):
         self.thread.settings()
     
+
+    def cambiarPlacaA(self):
+        if self.checkBoxHabilitarA.isChecked():
+            self.txtNombrePlacaA.setEnabled(True)
+            self.txtVDropPlacaA.setEnabled(True)
+            self.txtVWashPlacaA.setEnabled(True)
+            self.txtFactorDilucPlacaA.setEnabled(True)
+            self.txtFraccFiltroPlacaA.setEnabled(True)
+            self.txtTasaMuestreoPlacaA.setEnabled(True)
+            self.txtVelEnfriamientoPlacaA.setEnabled(True)
+            self.txtObservPlacaA.setEnabled(True)
+        else:
+            self.txtNombrePlacaA.setEnabled(False)
+            self.txtVDropPlacaA.setEnabled(False)
+            self.txtVWashPlacaA.setEnabled(False)
+            self.txtFactorDilucPlacaA.setEnabled(False)
+            self.txtFraccFiltroPlacaA.setEnabled(False)
+            self.txtTasaMuestreoPlacaA.setEnabled(False)
+            self.txtVelEnfriamientoPlacaA.setEnabled(False)
+            self.txtObservPlacaA.setEnabled(False)
+
+    def cambiarPlacaB(self):
+        if self.checkBoxHabilitarB.isChecked():
+            self.txtNombrePlacaB.setEnabled(True)
+            self.txtVDropPlacaB.setEnabled(True)
+            self.txtVWashPlacaB.setEnabled(True)
+            self.txtFactorDilucPlacaB.setEnabled(True)
+            self.txtFraccFiltroPlacaB.setEnabled(True)
+            self.txtTasaMuestreoPlacaB.setEnabled(True)
+            self.txtVelEnfriamientoPlacaB.setEnabled(True)
+            self.txtObservPlacaB.setEnabled(True)
+        else:
+            self.txtNombrePlacaB.setEnabled(False)
+            self.txtVDropPlacaB.setEnabled(False)
+            self.txtVWashPlacaB.setEnabled(False)
+            self.txtFactorDilucPlacaB.setEnabled(False)
+            self.txtFraccFiltroPlacaB.setEnabled(False)
+            self.txtTasaMuestreoPlacaB.setEnabled(False)
+            self.txtVelEnfriamientoPlacaB.setEnabled(False)
+            self.txtObservPlacaB.setEnabled(False)
+
+
+
+
+
+
+
     def filechooser(self):
         # Abrir el diálogo de selección de archivos
         file_dialog = QFileDialog()

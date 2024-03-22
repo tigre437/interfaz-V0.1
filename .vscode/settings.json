@@ -1,5 +1,7 @@
 {
     "python.analysis.extraPaths": [
         "./interfaz/GUI-UI"
-    ]
+    ],
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.autoImportCompletions": false
 }
