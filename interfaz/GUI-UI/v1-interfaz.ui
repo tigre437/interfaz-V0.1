@@ -865,7 +865,7 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="tab_3">
              <attribute name="title">
@@ -2586,15 +2586,16 @@
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="txtArchivos"/>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="buttonBuscarArchivos">
        <property name="text">
         <string>Abrir Carpeta</string>
        </property>
        <property name="icon">
-        <iconset theme="document-open"/>
+        <iconset theme="document-open">
+         <normaloff>.</normaloff>.</iconset>
        </property>
       </widget>
      </item>
