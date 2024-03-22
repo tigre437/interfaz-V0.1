@@ -1276,19 +1276,6 @@
                    </property>
                   </widget>
                  </item>
-                 <item>
-                  <widget class="QPushButton" name="buttonConectar">
-                   <property name="maximumSize">
-                    <size>
-                     <width>80</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Conectar</string>
-                   </property>
-                  </widget>
-                 </item>
                 </layout>
                </widget>
               </item>
