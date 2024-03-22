@@ -91,7 +91,7 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>2</number>
             </property>
             <property name="usesScrollButtons">
              <bool>true</bool>
@@ -467,7 +467,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtNombreExperimento"/>
+                  <widget class="QLineEdit" name="txtNombrePlacaA"/>
                  </item>
                 </layout>
                </widget>
@@ -501,7 +501,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtVDrop"/>
+                  <widget class="QLineEdit" name="txtVDropPlacaA"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_40">
@@ -554,7 +554,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtVWash"/>
+                  <widget class="QLineEdit" name="txtVWashPlacaA"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_41">
@@ -607,7 +607,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtFactorDiluc"/>
+                  <widget class="QLineEdit" name="txtFactorDilucPlacaA"/>
                  </item>
                 </layout>
                </widget>
@@ -641,7 +641,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtFraccFiltro"/>
+                  <widget class="QLineEdit" name="txtFraccFiltroPlacaA"/>
                  </item>
                 </layout>
                </widget>
@@ -675,7 +675,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtTasaMuestreo"/>
+                  <widget class="QLineEdit" name="txtTasaMuestreoPlacaA"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_43">
@@ -728,7 +728,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtVelEnfriamiento"/>
+                  <widget class="QLineEdit" name="txtVelEnfriamientoPlacaA"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_44">
@@ -784,7 +784,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPlainTextEdit" name="txtObservExperimento">
+                  <widget class="QPlainTextEdit" name="txtObservPlacaA">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
@@ -839,7 +839,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtNombreExperimento_3"/>
+                  <widget class="QLineEdit" name="txtNombrePlacaB"/>
                  </item>
                 </layout>
                </widget>
@@ -873,7 +873,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtVDrop_3"/>
+                  <widget class="QLineEdit" name="txtVDropPlacaB"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_94">
@@ -926,7 +926,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtVWash_3"/>
+                  <widget class="QLineEdit" name="txtVWashPlacaB"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_100">
@@ -979,7 +979,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtFactorDiluc_3"/>
+                  <widget class="QLineEdit" name="txtFactorDilucPlacaB"/>
                  </item>
                 </layout>
                </widget>
@@ -1013,7 +1013,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtFraccFiltro_3"/>
+                  <widget class="QLineEdit" name="txtFraccFiltroPlacaB"/>
                  </item>
                 </layout>
                </widget>
@@ -1047,7 +1047,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtTasaMuestreo_3"/>
+                  <widget class="QLineEdit" name="txtTasaMuestreoPlacaB"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_102">
@@ -1100,7 +1100,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtVelEnfriamiento_3"/>
+                  <widget class="QLineEdit" name="txtVelEnfriamientoPlacaB"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="label_92">
@@ -1156,7 +1156,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPlainTextEdit" name="txtObservExperimento_3">
+                  <widget class="QPlainTextEdit" name="txtObservPlacaB">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
