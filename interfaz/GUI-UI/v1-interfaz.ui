@@ -208,7 +208,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtIdMuestreador"/>
+                  <widget class="QLineEdit" name="txtIdMuestreadorPA"/>
                  </item>
                 </layout>
                </widget>
@@ -1429,13 +1429,16 @@
                            <height>16777215</height>
                           </size>
                          </property>
+                         <property name="singleStep">
+                          <number>1</number>
+                         </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
                          </property>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QDoubleSpinBox" name="doubleSpinBox">
+                        <widget class="QDoubleSpinBox" name="dSpinBoxRadioMin">
                          <property name="maximumSize">
                           <size>
                            <width>50</width>
@@ -1477,7 +1480,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+                        <widget class="QDoubleSpinBox" name="dSpinBoxRadioMax">
                          <property name="maximumSize">
                           <size>
                            <width>50</width>
@@ -1519,7 +1522,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
+                        <widget class="QDoubleSpinBox" name="dSpinBoxGradoPolig">
                          <property name="maximumSize">
                           <size>
                            <width>50</width>
@@ -1561,7 +1564,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
+                        <widget class="QDoubleSpinBox" name="dSpinBoxUmbral">
                          <property name="maximumSize">
                           <size>
                            <width>50</width>
@@ -1704,7 +1707,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
+                        <widget class="QDoubleSpinBox" name="dSpinBoxTempMin">
                          <property name="maximumSize">
                           <size>
                            <width>50</width>
@@ -1746,7 +1749,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QDoubleSpinBox" name="doubleSpinBox_8">
+                        <widget class="QDoubleSpinBox" name="dSpinBoxTempMax">
                          <property name="maximumSize">
                           <size>
                            <width>50</width>
@@ -1788,7 +1791,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
+                        <widget class="QDoubleSpinBox" name="dSpinBoxTempSet">
                          <property name="maximumSize">
                           <size>
                            <width>50</width>
@@ -2038,7 +2041,7 @@
           </size>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <property name="usesScrollButtons">
           <bool>true</bool>

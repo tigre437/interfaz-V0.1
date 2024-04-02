@@ -72,14 +72,43 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # Habilita o deshabilita campos según el estado del checkbox
         if self.checkBoxHabilitarA.isChecked():
             self.txtNombrePlacaA.setEnabled(True)
-            # Otros campos habilitados...
+            self.txtVDropPlacaA.setEnabled(True)
+            self.txtVWashPlacaA.setEnabled(True)
+            self.txtFactorDilucPlacaA.setEnabled(True)
+            self.txtFraccFiltroPlacaA.setEnabled(True)
+            self.txtTasaMuestreoPlacaA.setEnabled(True)
+            self.txtVelEnfriamientoPlacaA.setEnabled(True)
+            self.txtObservPlacaA.setEnabled(True)
         else:
             self.txtNombrePlacaA.setEnabled(False)
-            # Otros campos deshabilitados...
+            self.txtVDropPlacaA.setEnabled(False)
+            self.txtVWashPlacaA.setEnabled(False)
+            self.txtFactorDilucPlacaA.setEnabled(False)
+            self.txtFraccFiltroPlacaA.setEnabled(False)
+            self.txtTasaMuestreoPlacaA.setEnabled(False)
+            self.txtVelEnfriamientoPlacaA.setEnabled(False)
+            self.txtObservPlacaA.setEnabled(False)
 
     def cambiarPlacaB(self):
-        # Similar a cambiarPlacaA
-        pass
+        if self.checkBoxHabilitarB.isChecked():
+            self.txtNombrePlacaB.setEnabled(True)
+            self.txtVDropPlacaB.setEnabled(True)
+            self.txtVWashPlacaB.setEnabled(True)
+            self.txtFactorDilucPlacaB.setEnabled(True)
+            self.txtFraccFiltroPlacaB.setEnabled(True)
+            self.txtTasaMuestreoPlacaB.setEnabled(True)
+            self.txtVelEnfriamientoPlacaB.setEnabled(True)
+            self.txtObservPlacaB.setEnabled(True)
+        else:
+            self.txtNombrePlacaB.setEnabled(False)
+            self.txtVDropPlacaB.setEnabled(False)
+            self.txtVWashPlacaB.setEnabled(False)
+            self.txtFactorDilucPlacaB.setEnabled(False)
+            self.txtFraccFiltroPlacaB.setEnabled(False)
+            self.txtTasaMuestreoPlacaB.setEnabled(False)
+            self.txtVelEnfriamientoPlacaB.setEnabled(False)
+            self.txtObservPlacaB.setEnabled(False)
+            
 
     def buscar_carpetas_sns(self, directorio):
         # Retorna una lista de carpetas que comienzan con "SNS" dentro del directorio dado
@@ -174,7 +203,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
 
 
-
     ######################### PARTE DEL JSON #################################
         
 
@@ -223,6 +251,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.txaObservFiltro.clear()  # Limpiamos el campo si las observaciones son nulas
 
 
+
+    ################################   DESLIZADORES   #############################
+
+    
 
 
 
