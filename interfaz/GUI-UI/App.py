@@ -1,5 +1,5 @@
-from PyQt6 import QtWidgets
-from PyQt6.QtWidgets import QMainWindow, QFileDialog, QDialog, QLabel, QLineEdit, QPushButton, QVBoxLayout
+from PyQt6 import QtWidgets, QtCore
+from PyQt6.QtWidgets import QMainWindow, QFileDialog, QDialog, QLabel, QLineEdit, QPushButton, QVBoxLayout, QMessageBox
 from PyQt6.QtCore import QTimer, QThread, pyqtSignal, pyqtSlot, Qt
 from PyQt6.QtGui import QPixmap, QImage, QTransform
 import cv2
@@ -10,8 +10,10 @@ import time
 import datetime
 import numpy as np
 import serial.tools.list_ports
+import json
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
+    
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)  # Configura la interfaz gráfica definida en Ui_MainWindow
@@ -19,6 +21,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # Conexiones de los botones con los métodos correspondientes
         self.buttonBuscarArchivos.clicked.connect(self.filechooser)
         self.buttonConfiguracion.clicked.connect(self.openConfigCamera)
+        self.comboBoxFiltro.addItem("Crear un filtro nuevo ...")
 
         # Instancia del hilo para captura de video
         self.thread = VideoThread()
@@ -105,16 +108,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def comprobar_opcion_seleccionada(self, index):
         if index == 0:  
+            if(self.txtArchivos.text() == None or self.txtArchivos.text() == ""):
+                QMessageBox.warning(self, "Alerta", "Seleccione una carpeta para guardar los filtros antes de continuar.")
+                self.filechooser()
             nombre_carpeta = self.obtener_nombre_carpeta()
             if nombre_carpeta:
                 self.crear_carpeta(nombre_carpeta)
+        else:
+            datos = self.leer_json_filtro(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "filter.json")
+            self.rellenar_datos(datos)
+            print(datos)
 
     def obtener_nombre_carpeta(self):
         # Abre un diálogo para ingresar el nombre de la carpeta
         dialogo = QDialog(self)
-        dialogo.setWindowTitle("Nombre de la carpeta")
+        dialogo.setWindowTitle("Nombre del filtro")
         
-        etiqueta = QLabel("Ingrese el nombre de la carpeta:")
+        etiqueta = QLabel("Ingrese el nombre del filtros:")
         campo_texto = QLineEdit()
         boton_aceptar = QPushButton("Aceptar")
         boton_cancelar = QPushButton("Cancelar")
@@ -160,6 +170,62 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def openConfigCamera(self):
         print("Configurando cámara...")
+
+
+
+
+
+    ######################### PARTE DEL JSON #################################
+        
+
+
+    def leer_json_filtro(self, archivo_json):
+        """Lee un archivo JSON y devuelve los datos relevantes"""
+        with open(archivo_json, 'r') as f:
+            data = json.load(f)
+
+        label = data.get('label', 'Sin etiqueta')
+        storage_temperature = data.get('storage_temperature', 0)
+        sampler_id = data.get('sampler_id', 'Sin ID')
+        filter_position = data.get('filter_position', 0)
+        air_volume = data.get('air_volume', 0.0)
+        start_time = data.get('start_time', 'Sin hora de inicio')
+        end_time = data.get('end_time', 'Sin hora de fin')
+        observations = data.get('observations', 'Sin observaciones')
+
+        return {
+            'label': label,
+            'storage_temperature': storage_temperature,
+            'sampler_id': sampler_id,
+            'filter_position': filter_position,
+            'air_volume': air_volume,
+            'start_time': start_time,
+            'end_time': end_time,
+            'observations': observations
+        }
+
+
+
+    def rellenar_datos(self, datos):
+        # Asigna los valores correspondientes a cada campo de texto
+        self.txtNombreFiltro.setText(datos['label'])
+        self.txtTempStorage.setText(str(datos['storage_temperature']))
+        self.txtIdMuestreador.setText(datos['sampler_id'])
+        self.txtPosFilter.setText(str(datos['filter_position']))
+        self.txtAirVol.setText(str(datos['air_volume']))
+        self.txtHoraInicio.setDateTime(QtCore.QDateTime.fromString(datos['start_time'], "yyyy-MM-dd hh:mm"))
+        self.txtHoraFin.setDateTime(QtCore.QDateTime.fromString(datos['end_time'], "yyyy-MM-dd hh:mm"))
+        
+        # Observaciones puede ser nulo, así que verificamos antes de asignar
+        if datos['observations'] is not None:
+            self.txaObservFiltro.setPlainText(datos['observations'])
+        else:
+            self.txaObservFiltro.clear()  # Limpiamos el campo si las observaciones son nulas
+
+
+
+
+
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
