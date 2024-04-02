@@ -1,6 +1,6 @@
 from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtWidgets import QMainWindow, QFileDialog, QDialog, QLabel, QLineEdit, QPushButton, QVBoxLayout, QMessageBox
-from PyQt6.QtCore import QTimer, QThread, pyqtSignal, pyqtSlot, Qt
+from PyQt6.QtCore import QTimer, QThread, pyqtSignal, pyqtSlot, Qt, QObject
 from PyQt6.QtGui import QPixmap, QImage, QTransform
 import cv2
 from interfazv1 import Ui_MainWindow  # Importa la interfaz de la ventana principal
@@ -41,13 +41,38 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.display_width = self.width() // 2
         self.display_height = self.height() // 2
 
+
+        # Conectar Sliders con Spin box
+        self.hSliderRadioMin.valueChanged.connect(self.dSpinBoxRadioMin.setValue)
+        self.hSliderRadioMax.valueChanged.connect(self.dSpinBoxRadioMax.setValue)
+        self.hSliderGradoPolig.valueChanged.connect(self.dSpinBoxGradoPolig.setValue)
+        self.hSliderUmbral.valueChanged.connect(self.dSpinBoxUmbral.setValue)
+
+        self.hSliderTempMin.valueChanged.connect(self.dSpinBoxTempMin.setValue)
+        self.hSliderTempMax.valueChanged.connect(self.dSpinBoxTempMax.setValue)
+        self.hSliderTempSet.valueChanged.connect(self.dSpinBoxTempSet.setValue)
+
+        # Conectar Spin boxes con Sliders
+        self.dSpinBoxRadioMin.valueChanged.connect(self.hSliderRadioMin.setValue)
+        self.dSpinBoxRadioMax.valueChanged.connect(self.hSliderRadioMax.setValue)
+        self.dSpinBoxGradoPolig.valueChanged.connect(self.hSliderGradoPolig.setValue)
+        self.dSpinBoxUmbral.valueChanged.connect(self.hSliderUmbral.setValue)
+
+        self.dSpinBoxTempMin.valueChanged.connect(self.hSliderTempMin.setValue)
+        self.dSpinBoxTempMax.valueChanged.connect(self.hSliderTempMax.setValue)
+        self.dSpinBoxTempSet.valueChanged.connect(self.hSliderTempSet.setValue)
+
+
+
+
     def list_cameras(self):
         cameras = []
-        for index in range(10):  
-            cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
-            if cap.isOpened():
-                cameras.append(index)
-                cap.release()
+        filter_graph = FilterGraph()
+        devices = filter_graph.get_input_devices()
+
+        for index, device in enumerate(devices):
+            cameras.append(index)
+
         return cameras
 
     def update_camera_index(self, index):
@@ -66,7 +91,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.comboBoxCamara.addItem(camera_name)
 
     def settings(self):
-        self.thread.settings()
+        selected_index = self.comboBoxCamara.currentIndex()
+        if selected_index == -1:
+            QMessageBox.critical(self, "Error", "No se ha seleccionado ninguna cámara.", QMessageBox.StandardButton.Ok)
+        else:
+            self.thread.settings()
+
+
+
+
+
+
+
+
 
     def cambiarPlacaA(self):
         # Habilita o deshabilita campos según el estado del checkbox

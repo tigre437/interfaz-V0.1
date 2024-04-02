@@ -7,9 +7,6 @@
     "start_time": "2024-03-21 07:00",
     "end_time": "2024-03-22 07:00",
     "observations": null,
-
-
-
     "v_drop": 2e-04,
     "v_wash": 0.02,
     "dil_factor": 1.0,
