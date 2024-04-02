@@ -2,3 +2,5 @@
 interfaz/Lib/
 interfaz/Include/
 interfaz/Scripts/
+interfaz/share
+interfaz/GUI-UI/__pycache__

@@ -44,6 +44,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.buttonGuardarParamTemp.clicked.connect(self.guardar_datos_temp)
         self.buttonCancelarParamTemp.clicked.connect(self.cancelar_cambios_temp)
+
+        self.buttonIniciar.clicked.connect(self.iniciar_expermiento)
         
         # Dimensiones para mostrar la imagen
         self.display_width = self.width() // 2
@@ -532,6 +534,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         nombre_filtro = self.comboBoxFiltro.currentText()
         ruta_json = os.path.join(carpeta_seleccionada, nombre_filtro, archivo)
         return ruta_json
+    
+
+
+    ######################### EXPERIMENTO #################################33
+
+    def iniciar_experimento(self):
+        with open(ruta_json, 'w') as file:
+            json.dump(datos_temp, file)
 
 
 
