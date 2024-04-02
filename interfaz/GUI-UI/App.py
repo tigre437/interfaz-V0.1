@@ -20,7 +20,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Conexiones de los botones con los métodos correspondientes
         self.buttonBuscarArchivos.clicked.connect(self.filechooser)
-        self.buttonConfiguracion.clicked.connect(self.openConfigCamera)
+        #self.buttonConfiguracion.clicked.connect(self.openConfigCamera)
         self.comboBoxFiltro.addItem("Crear un filtro nuevo ...")
 
         # Instancia del hilo para captura de video
@@ -38,6 +38,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.comboBoxFiltro.currentIndexChanged.connect(self.comprobar_opcion_seleccionada)
         self.buttonGuardarFiltro.clicked.connect(self.guardar_datos_filtro)
         self.buttonCancelarFiltro.clicked.connect(self.cancelar_cambios_filtro)
+
+        self.buttonGuardarParamDetec.clicked.connect(self.guardar_datos_detection)
+        self.buttonCancelarParamDetec.clicked.connect(self.cancelar_cambios_detect)
+
+        self.buttonGuardarParamTemp.clicked.connect(self.guardar_datos_temp)
+        self.buttonCancelarParamTemp.clicked.connect(self.cancelar_cambios_temp)
         
         # Dimensiones para mostrar la imagen
         self.display_width = self.width() // 2
@@ -193,10 +199,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.rellenar_datos_temp(datos_temp)
                 print(datos_temp)
 
+    
+
     def cancelar_cambios_filtro(self):
         """Cancela la edición del filtro seleccionado."""
-        index = self.comboBoxFiltro.currentIndex()
-        self.comprobar_opcion_seleccionada(index)
+        datos_filtro = self.leer_json_filtro(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "filter.json")
+        if (datos_filtro != None):
+            self.rellenar_datos_filtro(datos_filtro)
+            print(datos_filtro)
+
+    def cancelar_cambios_detect(self):
+        """Cancela la edición del filtro seleccionado."""
+        datos_detection = self.leer_json_detection(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "detection.json")
+        if (datos_detection != None):
+            self.rellenar_datos_detection(datos_detection)
+            print(datos_detection)
+
+    def cancelar_cambios_temp(self):
+        """Cancela la edición del filtro seleccionado."""
+        datos_temp = self.leer_json_temp(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "temp.json")
+        if (datos_temp != None):
+            self.rellenar_datos_temp(datos_temp)
+            print(datos_temp)
 
     def obtener_nombre_carpeta(self):
         """Abre un diálogo para ingresar el nombre de la carpeta."""
@@ -262,10 +286,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             print("Error: El directorio seleccionado no es válido.")
 
-
-    def openConfigCamera(self):
-        """Abre la configuración de la cámara."""
-        print("Configurando cámara...")
 
     ######################### JSON #################################
 
@@ -418,10 +438,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def guardar_datos_detection(self):
         """Guarda los datos de detección en un archivo JSON."""
         # Obtener los datos de los campos de detección
-        threshold = self.dSpinBoxThreshold.value()
-        min_radius = self.dSpinBoxMinRadius.value()
-        max_radius = self.dSpinBoxMaxRadius.value()
-        polygon = self.dSpinBoxPolygon.value()
+        threshold = self.dSpinBoxUmbral.value()
+        min_radius = self.dSpinBoxRadioMin.value()
+        max_radius = self.dSpinBoxRadioMax.value()
+        polygon = self.dSpinBoxGradoPolig.value()
+
 
         # Crear un diccionario con los datos de detección
         datos_detection = {

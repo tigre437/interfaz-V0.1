@@ -1,6 +1,1 @@
-{
-    "threshold": 180,
-    "min_radius": 14,
-    "max_radius": 20,
-    "polygon": 5
-}
+{"threshold": 25.0, "min_radius": 19.0, "max_radius": 20.0, "polygon": 5.0}

@@ -1,5 +1,1 @@
-{
-    "tempMax": 3.00,
-    "tempMin": 0.00,
-    "tempSet": 5.00
-}
+{"tempMax": 3.0, "tempMin": 23.0, "tempSet": 5.0}

@@ -1639,9 +1639,9 @@
                       </property>
                       <layout class="QHBoxLayout" name="horizontalLayout_29">
                        <item>
-                        <widget class="QPushButton" name="buttonAceptarParamDetec">
+                        <widget class="QPushButton" name="buttonGuardarParamDetec">
                          <property name="text">
-                          <string>Aceptar</string>
+                          <string>Guardar</string>
                          </property>
                         </widget>
                        </item>
@@ -1649,13 +1649,6 @@
                         <widget class="QPushButton" name="buttonCancelarParamDetec">
                          <property name="text">
                           <string>Cancelar</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="buttonAplicarParamDetec">
-                         <property name="text">
-                          <string>Aplicar</string>
                          </property>
                         </widget>
                        </item>
@@ -1866,9 +1859,9 @@
                       </property>
                       <layout class="QHBoxLayout" name="horizontalLayout_30">
                        <item>
-                        <widget class="QPushButton" name="buttonAceptarParamTemp">
+                        <widget class="QPushButton" name="buttonGuardarParamTemp">
                          <property name="text">
-                          <string>Aceptar</string>
+                          <string>Guardar</string>
                          </property>
                         </widget>
                        </item>
@@ -1876,13 +1869,6 @@
                         <widget class="QPushButton" name="buttonCancelarParamTemp">
                          <property name="text">
                           <string>Cancelar</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="buttonAplicarParamTemp">
-                         <property name="text">
-                          <string>Aplicar</string>
                          </property>
                         </widget>
                        </item>
