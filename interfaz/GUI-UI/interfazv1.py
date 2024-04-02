@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1340, 821)
+        MainWindow.resize(1340, 832)
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(parent=self.centralwidget)
@@ -1304,7 +1304,7 @@ class Ui_MainWindow(object):
         self.groupBox_2.setTitle(_translate("MainWindow", "Parametros de Temperatura"))
         self.label_9.setText(_translate("MainWindow", "Temp. Min. :"))
         self.label_10.setText(_translate("MainWindow", "Temp. Max. :"))
-        self.label_11.setText(_translate("MainWindow", "Temp. Set"))
+        self.label_11.setText(_translate("MainWindow", "Temp. Set. :"))
         self.buttonAceptarParamTemp.setText(_translate("MainWindow", "Aceptar"))
         self.buttonCancelarParamTemp.setText(_translate("MainWindow", "Cancelar"))
         self.buttonAplicarParamTemp.setText(_translate("MainWindow", "Aplicar"))

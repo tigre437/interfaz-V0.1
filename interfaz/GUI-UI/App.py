@@ -178,10 +178,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if nombre_carpeta:
                 self.crear_carpeta(nombre_carpeta)
         else:
-            datos = self.leer_json_filtro(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "filter.json")
-            if (datos != None):
-                self.rellenar_datos(datos)
-                print(datos)
+            datos_filtro = self.leer_json_filtro(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "filter.json")
+            if (datos_filtro != None):
+                self.rellenar_datos_filtro(datos_filtro)
+                print(datos_filtro)
+
+            datos_detection = self.leer_json_detection(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "detection.json")
+            if (datos_detection != None):
+                self.rellenar_datos_detection(datos_detection)
+                print(datos_detection)
+
+            datos_temp = self.leer_json_temp(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "temp.json")
+            if (datos_temp != None):
+                self.rellenar_datos_temp(datos_temp)
+                print(datos_temp)
 
     def cancelar_cambios_filtro(self):
         """Cancela la edición del filtro seleccionado."""
@@ -241,13 +251,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.comboBoxFiltro.setCurrentText(nombre_carpeta_sns)
 
             # Crear el archivo filter.json
-            self.crear_json_vacio(ruta_carpeta_sns)
+            self.crear_json_filtro(ruta_carpeta_sns)
+
+            # Cargar los datos del filtro recién creado
+            self.comprobar_opcion_seleccionada(1)  # Índice 1 para seleccionar el nuevo filtro
 
             # Vuelve a conectar la señal currentIndexChanged
             self.comboBoxFiltro.currentIndexChanged.connect(self.comprobar_opcion_seleccionada)
             
         else:
             print("Error: El directorio seleccionado no es válido.")
+
 
     def openConfigCamera(self):
         """Abre la configuración de la cámara."""
@@ -287,7 +301,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             'observations': observations
         }
 
-    def rellenar_datos(self, datos):
+    def rellenar_datos_filtro(self, datos):
         """Asigna los valores correspondientes a cada campo de texto."""
         self.txtNombreFiltro.setText(datos['label'])
         self.txtTempStorage.setText(str(datos['storage_temperature']))
@@ -307,7 +321,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         """Crea el archivo filter.json."""
         ruta_filter_json = os.path.join(ruta_carpeta_sns, 'filter.json')
         with open(ruta_filter_json, 'w') as file:
-            json.dump({}, file)  # Puedes añadir contenido inicial al diccionario si lo deseas
+            json.dump({
+                "label": "Sin etiqueta",
+                "storage_temperature": "0",
+                "sampler_id": "Sin ID",
+                "filter_position": "0",
+                "air_volume": "0.0",
+                "start_time": "2000-01-01 00:00",
+                "end_time": "2000-01-01 00:00",
+                "observations": "Sin observaciones"
+            }
+            , file) 
 
     def guardar_datos_filtro(self):
         """Guarda los datos del filtro en un archivo JSON."""
@@ -334,7 +358,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         }
 
         # Obtener la ruta del archivo JSON
-        ruta_json = self.obtener_ruta_json()
+        ruta_json = self.obtener_ruta_json("filter.json")
 
         # Guardar los datos en el archivo JSON
         with open(ruta_json, 'w') as file:
@@ -342,14 +366,153 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         QMessageBox.information(self, "Guardado", "Los datos del filtro se han actualizado correctamente.", QMessageBox.StandardButton.Ok)
 
-    def obtener_ruta_json(self):
+
+
+    def leer_json_detection(self, archivo_json):
+        """Lee un archivo JSON de detección y devuelve los datos relevantes."""
+        try:
+            with open(archivo_json, 'r') as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            QMessageBox.warning(self, "Advertencia", f"El archivo '{archivo_json}' no existe.", QMessageBox.StandardButton.Ok)
+            return
+        except json.JSONDecodeError:
+            QMessageBox.warning(self, "Advertencia", f"El archivo '{archivo_json}' no es un archivo JSON válido.", QMessageBox.StandardButton.Ok)
+            return
+
+        threshold = data.get('threshold', 180)
+        min_radius = data.get('min_radius', 14)
+        max_radius = data.get('max_radius', 20)
+        polygon = data.get('polygon', 5)
+
+        return {
+            'threshold': threshold,
+            'min_radius': min_radius,
+            'max_radius': max_radius,
+            'polygon': polygon
+        }
+
+    def rellenar_datos_detection(self, datos):
+        """Asigna los valores correspondientes a cada campo de texto de detección."""
+        self.hSliderUmbral.setValue(datos['threshold'])
+        self.dSpinBoxUmbral.setValue(datos['threshold'])
+        self.hSliderRadioMin.setValue(datos['min_radius'])
+        self.dSpinBoxRadioMin.setValue(datos['min_radius'])
+        self.hSliderRadioMax.setValue(datos['max_radius'])
+        self.dSpinBoxRadioMax.setValue(datos['max_radius'])
+        self.hSliderGradoPolig.setValue(datos['polygon'])
+        self.dSpinBoxGradoPolig.setValue(datos['polygon'])
+
+    def crear_json_detection(self, ruta_carpeta_sns):
+        """Crea el archivo detection.json."""
+        ruta_detection_json = os.path.join(ruta_carpeta_sns, 'detection.json')
+        with open(ruta_detection_json, 'w') as file:
+            json.dump({
+                "threshold": 180,
+                "min_radius": 14,
+                "max_radius": 20,
+                "polygon": 5
+            }
+            , file) 
+
+    def guardar_datos_detection(self):
+        """Guarda los datos de detección en un archivo JSON."""
+        # Obtener los datos de los campos de detección
+        threshold = self.dSpinBoxThreshold.value()
+        min_radius = self.dSpinBoxMinRadius.value()
+        max_radius = self.dSpinBoxMaxRadius.value()
+        polygon = self.dSpinBoxPolygon.value()
+
+        # Crear un diccionario con los datos de detección
+        datos_detection = {
+            'threshold': threshold,
+            'min_radius': min_radius,
+            'max_radius': max_radius,
+            'polygon': polygon
+        }
+
+        # Obtener la ruta del archivo JSON
+        ruta_json = self.obtener_ruta_json("detection.json")
+
+        # Guardar los datos de detección en el archivo JSON
+        with open(ruta_json, 'w') as file:
+            json.dump(datos_detection, file)
+
+        QMessageBox.information(self, "Guardado", "Los datos de detección se han actualizado correctamente.", QMessageBox.StandardButton.Ok)
+
+
+    def leer_json_temp(self, archivo_json):
+        """Lee un archivo JSON de temperatura y devuelve los datos relevantes."""
+        try:
+            with open(archivo_json, 'r') as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            QMessageBox.warning(self, "Advertencia", f"El archivo '{archivo_json}' no existe.", QMessageBox.StandardButton.Ok)
+            return
+        except json.JSONDecodeError:
+            QMessageBox.warning(self, "Advertencia", f"El archivo '{archivo_json}' no es un archivo JSON válido.", QMessageBox.StandardButton.Ok)
+            return
+
+        temp_max = data.get('tempMax', 0.00)
+        temp_min = data.get('tempMin', 0.00)
+        temp_set = data.get('tempSet', 0.00)
+
+        return {
+            'tempMax': temp_max,
+            'tempMin': temp_min,
+            'tempSet': temp_set
+        }
+
+    def rellenar_datos_temp(self, datos):
+        """Asigna los valores correspondientes a cada campo de texto de temperatura."""
+        self.dSpinBoxTempMax.setValue(datos['tempMax'])
+        self.dSpinBoxTempMin.setValue(datos['tempMin'])
+        self.dSpinBoxTempSet.setValue(datos['tempSet'])
+
+    def crear_json_temp(self, ruta_carpeta_sns):
+        """Crea el archivo temp.json."""
+        ruta_temp_json = os.path.join(ruta_carpeta_sns, 'temp.json')
+        with open(ruta_temp_json, 'w') as file:
+            json.dump({
+                "tempMax": 0.00,
+                "tempMin": 0.00,
+                "tempSet": 0.00
+            }, file) 
+
+    def guardar_datos_temp(self):
+        """Guarda los datos de temperatura en un archivo JSON."""
+        # Obtener los datos de los campos de temperatura
+        temp_max = self.dSpinBoxTempMax.value()
+        temp_min = self.dSpinBoxTempMin.value()
+        temp_set = self.dSpinBoxTempSet.value()
+
+        # Crear un diccionario con los datos de temperatura
+        datos_temp = {
+            'tempMax': temp_max,
+            'tempMin': temp_min,
+            'tempSet': temp_set
+        }
+
+        # Obtener la ruta del archivo JSON
+        ruta_json = self.obtener_ruta_json("temp.json")
+
+        # Guardar los datos de temperatura en el archivo JSON
+        with open(ruta_json, 'w') as file:
+            json.dump(datos_temp, file)
+
+        QMessageBox.information(self, "Guardado", "Los datos de temperatura se han actualizado correctamente.", QMessageBox.StandardButton.Ok)
+
+
+
+
+    def obtener_ruta_json(self, archivo):
         """Obtiene la ruta completa del archivo JSON."""
         carpeta_seleccionada = self.txtArchivos.text()
         nombre_filtro = self.comboBoxFiltro.currentText()
-        ruta_json = os.path.join(carpeta_seleccionada, nombre_filtro, 'filter.json')
+        ruta_json = os.path.join(carpeta_seleccionada, nombre_filtro, archivo)
         return ruta_json
 
-    ################################   DESLIZADORES   #############################
+
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
