@@ -1328,7 +1328,7 @@
          <property name="minimumSize">
           <size>
            <width>370</width>
-           <height>450</height>
+           <height>400</height>
           </size>
          </property>
          <property name="maximumSize">
@@ -1349,7 +1349,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>430</height>
+              <height>400</height>
              </size>
             </property>
             <property name="currentIndex">
@@ -1883,6 +1883,44 @@
               </item>
              </layout>
             </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignLeft|Qt::AlignVCenter">
+        <widget class="QFrame" name="frame_9">
+         <property name="minimumSize">
+          <size>
+           <width>375</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="buttonIniciar">
+            <property name="text">
+             <string>INICIAR</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="buttonParar">
+            <property name="text">
+             <string>PARAR</string>
+            </property>
            </widget>
           </item>
          </layout>
