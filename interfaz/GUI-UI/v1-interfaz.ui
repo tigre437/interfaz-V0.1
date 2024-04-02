@@ -208,7 +208,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="txtIdMuestreadorPA"/>
+                  <widget class="QLineEdit" name="txtIdMuestreador"/>
                  </item>
                 </layout>
                </widget>
@@ -418,6 +418,53 @@
                      <width>0</width>
                      <height>186</height>
                     </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="frame_58">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_42">
+                 <property name="leftMargin">
+                  <number>9</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QPushButton" name="buttonGuardarFiltro">
+                   <property name="text">
+                    <string>Guardar</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="buttonCancelarFiltro">
+                   <property name="text">
+                    <string>Cancelar</string>
                    </property>
                   </widget>
                  </item>

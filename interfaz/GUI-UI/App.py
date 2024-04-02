@@ -36,11 +36,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.checkBoxHabilitarA.stateChanged.connect(self.cambiarPlacaA)
         self.checkBoxHabilitarB.stateChanged.connect(self.cambiarPlacaB)
         self.comboBoxFiltro.currentIndexChanged.connect(self.comprobar_opcion_seleccionada)
+        self.buttonGuardarFiltro.clicked.connect(self.guardar_datos_filtro)
+        self.buttonCancelarFiltro.clicked.connect(self.cancelar_cambios_filtro)
         
         # Dimensiones para mostrar la imagen
         self.display_width = self.width() // 2
         self.display_height = self.height() // 2
-
 
         # Conectar Sliders con Spin box
         self.hSliderRadioMin.valueChanged.connect(self.dSpinBoxRadioMin.setValue)
@@ -62,10 +63,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.dSpinBoxTempMax.valueChanged.connect(self.hSliderTempMax.setValue)
         self.dSpinBoxTempSet.valueChanged.connect(self.hSliderTempSet.setValue)
 
-
-
-
     def list_cameras(self):
+        """Obtiene una lista de cámaras disponibles."""
         cameras = []
         filter_graph = FilterGraph()
         devices = filter_graph.get_input_devices()
@@ -76,6 +75,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         return cameras
 
     def update_camera_index(self, index):
+        """Actualiza el índice de la cámara seleccionada."""
         if self.thread and self.thread.isRunning():
             self.thread.stop()  
             self.thread.finished.connect(self.thread.deleteLater)  
@@ -86,27 +86,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.thread.start()
 
     def fillCameras(self):
+        """Llena el combobox con las cámaras disponibles."""
         available_cameras = self.get_available_cameras()
         for camera_index, camera_name in available_cameras.items():
             self.comboBoxCamara.addItem(camera_name)
 
     def settings(self):
+        """Abre la configuración de la cámara."""
         selected_index = self.comboBoxCamara.currentIndex()
         if selected_index == -1:
             QMessageBox.critical(self, "Error", "No se ha seleccionado ninguna cámara.", QMessageBox.StandardButton.Ok)
         else:
             self.thread.settings()
 
-
-
-
-
-
-
-
-
     def cambiarPlacaA(self):
-        # Habilita o deshabilita campos según el estado del checkbox
+        """Habilita o deshabilita campos según el estado del checkbox."""
         if self.checkBoxHabilitarA.isChecked():
             self.txtNombrePlacaA.setEnabled(True)
             self.txtVDropPlacaA.setEnabled(True)
@@ -127,6 +121,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.txtObservPlacaA.setEnabled(False)
 
     def cambiarPlacaB(self):
+        """Habilita o deshabilita campos según el estado del checkbox."""
         if self.checkBoxHabilitarB.isChecked():
             self.txtNombrePlacaB.setEnabled(True)
             self.txtVDropPlacaB.setEnabled(True)
@@ -146,15 +141,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.txtVelEnfriamientoPlacaB.setEnabled(False)
             self.txtObservPlacaB.setEnabled(False)
             
-
     def buscar_carpetas_sns(self, directorio):
-        # Retorna una lista de carpetas que comienzan con "SNS" dentro del directorio dado
+        """Retorna una lista de carpetas que comienzan con 'SNS' dentro del directorio dado."""
         carpetas = [nombre for nombre in os.listdir(directorio) if os.path.isdir(os.path.join(directorio, nombre))]
         carpetas_sns = [carpeta for carpeta in carpetas if carpeta.startswith("SNS")]
         return carpetas_sns
 
     def filechooser(self):
-        # Abre un diálogo para seleccionar una carpeta
+        """Abre un diálogo para seleccionar una carpeta."""
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.FileMode.Directory)
         
@@ -165,14 +159,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             carpetas_sns = self.buscar_carpetas_sns(carpeta_seleccionada)
             
             if carpetas_sns:
-                self.comboBoxFiltro.clear()
-                self.comboBoxFiltro.addItem("Crear un filtro nuevo ...")
+
+                if self.comboBoxFiltro.count() > 1:
+                    self.comboBoxFiltro.clear()
+                    self.comboBoxFiltro.addItem("Crear un filtro nuevo ...")
                 for carpeta in carpetas_sns:
                     self.comboBoxFiltro.addItem(carpeta)
             else:
                 print("No se encontraron carpetas que empiecen por 'SNS' dentro de la carpeta seleccionada.")
 
     def comprobar_opcion_seleccionada(self, index):
+        """Comprueba la opción seleccionada en el combobox de filtros."""
         if index == 0:  
             if(self.txtArchivos.text() == None or self.txtArchivos.text() == ""):
                 QMessageBox.warning(self, "Alerta", "Seleccione una carpeta para guardar los filtros antes de continuar.")
@@ -182,11 +179,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.crear_carpeta(nombre_carpeta)
         else:
             datos = self.leer_json_filtro(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "filter.json")
-            self.rellenar_datos(datos)
-            print(datos)
+            if (datos != None):
+                self.rellenar_datos(datos)
+                print(datos)
+
+    def cancelar_cambios_filtro(self):
+        """Cancela la edición del filtro seleccionado."""
+        index = self.comboBoxFiltro.currentIndex()
+        self.comprobar_opcion_seleccionada(index)
 
     def obtener_nombre_carpeta(self):
-        # Abre un diálogo para ingresar el nombre de la carpeta
+        """Abre un diálogo para ingresar el nombre de la carpeta."""
         dialogo = QDialog(self)
         dialogo.setWindowTitle("Nombre del filtro")
         
@@ -217,6 +220,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             return None
 
     def crear_carpeta(self, nombre_carpeta):
+        """Crea una carpeta para el nuevo filtro."""
         fecha_actual = datetime.datetime.now().strftime("%Y%m%d")
         nombre_carpeta_sns = f"SNS_{fecha_actual}_{nombre_carpeta}"
         directorio_seleccionado = self.txtArchivos.text()
@@ -226,28 +230,42 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             os.makedirs(ruta_carpeta_sns)
             print(f"Carpeta '{nombre_carpeta_sns}' creada exitosamente en '{directorio_seleccionado}'.")
             carpetas_sns = self.buscar_carpetas_sns(directorio_seleccionado)
+
+            # Desconecta la señal currentIndexChanged temporalmente
+            self.comboBoxFiltro.currentIndexChanged.disconnect(self.comprobar_opcion_seleccionada)
+
             self.comboBoxFiltro.clear()
             self.comboBoxFiltro.addItem("Crear un filtro nuevo ...")
             for carpeta in carpetas_sns:
                 self.comboBoxFiltro.addItem(carpeta)
             self.comboBoxFiltro.setCurrentText(nombre_carpeta_sns)
+
+            # Crear el archivo filter.json
+            self.crear_json_vacio(ruta_carpeta_sns)
+
+            # Vuelve a conectar la señal currentIndexChanged
+            self.comboBoxFiltro.currentIndexChanged.connect(self.comprobar_opcion_seleccionada)
+            
         else:
             print("Error: El directorio seleccionado no es válido.")
 
     def openConfigCamera(self):
+        """Abre la configuración de la cámara."""
         print("Configurando cámara...")
 
-
-
-
-    ######################### PARTE DEL JSON #################################
-        
-
+    ######################### JSON #################################
 
     def leer_json_filtro(self, archivo_json):
-        """Lee un archivo JSON y devuelve los datos relevantes"""
-        with open(archivo_json, 'r') as f:
-            data = json.load(f)
+        """Lee un archivo JSON y devuelve los datos relevantes."""
+        try:
+            with open(archivo_json, 'r') as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            QMessageBox.warning(self, "Advertencia", f"El archivo '{archivo_json}' no existe.", QMessageBox.StandardButton.Ok)
+            return
+        except json.JSONDecodeError:
+            QMessageBox.warning(self, "Advertencia", f"El archivo '{archivo_json}' no es un archivo JSON válido.", QMessageBox.StandardButton.Ok)
+            return
 
         label = data.get('label', 'Sin etiqueta')
         storage_temperature = data.get('storage_temperature', 0)
@@ -269,10 +287,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             'observations': observations
         }
 
-
-
     def rellenar_datos(self, datos):
-        # Asigna los valores correspondientes a cada campo de texto
+        """Asigna los valores correspondientes a cada campo de texto."""
         self.txtNombreFiltro.setText(datos['label'])
         self.txtTempStorage.setText(str(datos['storage_temperature']))
         self.txtIdMuestreador.setText(datos['sampler_id'])
@@ -287,18 +303,57 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             self.txaObservFiltro.clear()  # Limpiamos el campo si las observaciones son nulas
 
+    def crear_json_filtro(self, ruta_carpeta_sns):
+        """Crea el archivo filter.json."""
+        ruta_filter_json = os.path.join(ruta_carpeta_sns, 'filter.json')
+        with open(ruta_filter_json, 'w') as file:
+            json.dump({}, file)  # Puedes añadir contenido inicial al diccionario si lo deseas
 
+    def guardar_datos_filtro(self):
+        """Guarda los datos del filtro en un archivo JSON."""
+        # Obtener los datos de los campos de texto
+        label = self.txtNombreFiltro.text()
+        storage_temperature = self.txtTempStorage.text()
+        sampler_id = self.txtIdMuestreador.text()
+        filter_position = self.txtPosFilter.text()
+        air_volume = self.txtAirVol.text()
+        start_time = self.txtHoraInicio.dateTime().toString("yyyy-MM-dd hh:mm")
+        end_time = self.txtHoraFin.dateTime().toString("yyyy-MM-dd hh:mm")
+        observations = self.txaObservFiltro.toPlainText()
+
+        # Crear un diccionario con los datos
+        datos_filtro = {
+            'label': label,
+            'storage_temperature': storage_temperature,
+            'sampler_id': sampler_id,
+            'filter_position': filter_position,
+            'air_volume': air_volume,
+            'start_time': start_time,
+            'end_time': end_time,
+            'observations': observations
+        }
+
+        # Obtener la ruta del archivo JSON
+        ruta_json = self.obtener_ruta_json()
+
+        # Guardar los datos en el archivo JSON
+        with open(ruta_json, 'w') as file:
+            json.dump(datos_filtro, file)
+
+        QMessageBox.information(self, "Guardado", "Los datos del filtro se han actualizado correctamente.", QMessageBox.StandardButton.Ok)
+
+    def obtener_ruta_json(self):
+        """Obtiene la ruta completa del archivo JSON."""
+        carpeta_seleccionada = self.txtArchivos.text()
+        nombre_filtro = self.comboBoxFiltro.currentText()
+        ruta_json = os.path.join(carpeta_seleccionada, nombre_filtro, 'filter.json')
+        return ruta_json
 
     ################################   DESLIZADORES   #############################
 
-    
-
-
-
-
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
-        """Actualiza el QLabel con una nueva imagen de OpenCV"""
+        """Actualiza el QLabel con una nueva imagen de OpenCV."""
         qt_img = self.convert_cv_qt(cv_img)
         transform = QTransform()
         transform.rotate(90)
@@ -307,7 +362,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.labelCamara.setFixedSize(qt_img.size())
 
     def convert_cv_qt(self, cv_img):
-        """Convierte una imagen de OpenCV a QPixmap"""
+        """Convierte una imagen de OpenCV a QPixmap."""
         rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb_image.shape
         bytes_per_line = ch * w
@@ -315,8 +370,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         p = convert_to_Qt_format.scaled(self.display_width, self.display_height, Qt.AspectRatioMode.KeepAspectRatio)
         return QPixmap.fromImage(p)
 
-    def get_available_cameras(self) :
-        """Obtiene las cámaras disponibles utilizando pygrabber"""
+    def get_available_cameras(self):
+        """Obtiene las cámaras disponibles utilizando pygrabber."""
         devices = FilterGraph().get_input_devices()
         available_cameras = {}
         for device_index, device_name in enumerate(devices):
@@ -324,7 +379,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         return available_cameras
 
     def get_status(self):
-        """Actualiza la fecha y hora en el widget datetime"""
+        """Actualiza la fecha y hora en el widget datetime."""
         self.datetime.setText(f'{datetime.datetime.now():%m/%d/%Y %H:%M:%S}')
 
 class VideoThread(QThread):
@@ -336,7 +391,7 @@ class VideoThread(QThread):
         self._run_flag = True
 
     def run(self):
-        """Inicia el hilo para la captura de video"""
+        """Inicia el hilo para la captura de video."""
         self.cap = cv2.VideoCapture(self.camera_index, cv2.CAP_DSHOW)
         while self._run_flag:
             ret, cv_img = self.cap.read()
@@ -345,22 +400,22 @@ class VideoThread(QThread):
         self.cap.release()
 
     def stop(self):
-        """Detiene el hilo"""
+        """Detiene el hilo."""
         self._run_flag = False
         self.wait()
 
     def settings(self):
-        """Abre la configuración de la cámara"""
+        """Abre la configuración de la cámara."""
         self.cap.set(cv2.CAP_PROP_SETTINGS, 1)
 
     def save(self):
-        """Guarda la imagen capturada"""
+        """Guarda la imagen capturada."""
         ret, cv_img = self.cap.read()
         if ret:
             cv2.imwrite(r'C:\Users\david\Desktop\interfaz-V0.1\imagenes-prueba', cv_img)
 
     def set_camera_index(self, index):
-        """Establece el índice del dispositivo de captura"""
+        """Establece el índice del dispositivo de captura."""
         self.camera_index = index
 
 # Creación de la aplicación y ventana principal
