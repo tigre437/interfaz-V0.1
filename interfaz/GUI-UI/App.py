@@ -1,22 +1,32 @@
-from PyQt6 import QtWidgets, QtCore
-from PyQt6.QtWidgets import QMainWindow, QFileDialog, QDialog, QLabel, QLineEdit, QPushButton, QVBoxLayout, QMessageBox
-from PyQt6.QtCore import QTimer, QThread, pyqtSignal, pyqtSlot, Qt, QObject
-from PyQt6.QtGui import QPixmap, QImage, QTransform
+import os
 import cv2
+import json
+import numpy as np
+import pyqtgraph as pg
+from PyQt6 import QtWidgets, QtCore
+from PyQt6.QtWidgets import (
+    QFileDialog, QDialog, QLabel, QLineEdit,
+    QPushButton, QVBoxLayout, QMessageBox, QGraphicsProxyWidget
+)
+from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, Qt, QObject
+from PyQt6.QtGui import QPixmap, QImage, QTransform
 from interfazv1 import Ui_MainWindow  # Importa la interfaz de la ventana principal
 from pygrabber.dshow_graph import FilterGraph
-import os
-import time
 import datetime
-import numpy as np
-import serial.tools.list_ports
-import json
+
+
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)  # Configura la interfaz gráfica definida en Ui_MainWindow
+
+        # Graficas
+        scene = QtWidgets.QGraphicsScene()
+
+        # Asignar el QGraphicsScene a graphicsView
+        self.graphicsView.setScene(scene)
 
         # Conexiones de los botones con los métodos correspondientes
         self.buttonBuscarArchivos.clicked.connect(self.filechooser)
@@ -38,14 +48,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.comboBoxFiltro.currentIndexChanged.connect(self.comprobar_opcion_seleccionada)
         self.buttonGuardarFiltro.clicked.connect(self.guardar_datos_filtro)
         self.buttonCancelarFiltro.clicked.connect(self.cancelar_cambios_filtro)
+        self.buttonIniciar.clicked.connect(self.iniciar_experimento)
 
         self.buttonGuardarParamDetec.clicked.connect(self.guardar_datos_detection)
         self.buttonCancelarParamDetec.clicked.connect(self.cancelar_cambios_detect)
 
         self.buttonGuardarParamTemp.clicked.connect(self.guardar_datos_temp)
         self.buttonCancelarParamTemp.clicked.connect(self.cancelar_cambios_temp)
+        self.pintar_grafica()
 
-        self.buttonIniciar.clicked.connect(self.iniciar_expermiento)
+        #self.buttonIniciar.clicked.connect(self.iniciar_expermiento)
         
         # Dimensiones para mostrar la imagen
         self.display_width = self.width() // 2
@@ -70,6 +82,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.dSpinBoxTempMin.valueChanged.connect(self.hSliderTempMin.setValue)
         self.dSpinBoxTempMax.valueChanged.connect(self.hSliderTempMax.setValue)
         self.dSpinBoxTempSet.valueChanged.connect(self.hSliderTempSet.setValue)
+
+
+        
+
 
     def list_cameras(self):
         """Obtiene una lista de cámaras disponibles."""
@@ -269,7 +285,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
             # Desconecta la señal currentIndexChanged temporalmente
             self.comboBoxFiltro.currentIndexChanged.disconnect(self.comprobar_opcion_seleccionada)
-
             self.comboBoxFiltro.clear()
             self.comboBoxFiltro.addItem("Crear un filtro nuevo ...")
             for carpeta in carpetas_sns:
@@ -537,11 +552,78 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
 
 
-    ######################### EXPERIMENTO #################################33
+    ######################## GRAFICA ####################################
+    
+    def pintar_grafica(self):
+        """Pinta una gráfica utilizando PyQtGraph y la muestra en un QGraphicsView."""
+        # Crear datos de ejemplo
+        x = np.linspace(0, 10, 100)
+        y = np.sin(x)
+
+        # Crear un widget de gráfico
+        self.plot_widget = pg.PlotWidget()
+
+        # Agregar el gráfico al widget
+        self.plot_widget.plot(x, y, pen=pg.mkPen(color='w'))  # Color de la línea
+        self.plot_widget.setBackground('k')  # Color de fondo
+        self.plot_widget.setTitle('Rampa de enfriamiento', color='w')  # Color del título
+        self.plot_widget.showGrid(x=True, y=True, alpha=0.6)  # Mostrar rejilla
+        self.plot_widget.getAxis('bottom').setPen(pg.mkPen(color='w'))  # Color del eje x
+        self.plot_widget.getAxis('left').setPen(pg.mkPen(color='w'))  # Color del eje y
+        self.plot_widget.getAxis('bottom').setTextPen('w')  # Color de los números en el eje x
+        self.plot_widget.getAxis('left').setTextPen('w')  # Color de los números en el eje y
+
+        # Crear un proxy widget para el plot_widget
+        proxy = QGraphicsProxyWidget()
+        proxy.setWidget(self.plot_widget)
+
+        # Ajustar el tamaño del proxy para que coincida con el plot_widget
+        proxy.setPos(0, 0)
+        proxy.resize(self.graphicsView.width(), self.graphicsView.height())
+
+        # Agregar el proxy al graphicsView
+        self.graphicsView.scene().addItem(proxy)
+
+    ######################### EXPERIMENTO #################################
+        
+    def obtener_ruta_experimento_json(self):
+        """Obtiene la ruta completa del archivo JSON."""
+        carpeta_seleccionada = self.txtArchivos.text()
+        nombre_filtro = self.comboBoxFiltro.currentText()
+        nombre_experimento = self.txtNombrePlacaA.text()
+
+        
+        ruta_json = os.path.join(carpeta_seleccionada, nombre_filtro,nombre_experimento, "experimento.json")
+        return ruta_json
+    
+    def obtener_ruta_experimento(self):
+        """Obtiene la ruta completa del archivo JSON."""
+        carpeta_seleccionada = self.txtArchivos.text()
+        nombre_filtro = self.comboBoxFiltro.currentText()
+        nombre_experimento = self.txtNombrePlacaA.text()
+
+        
+        ruta_json = os.path.join(carpeta_seleccionada, nombre_filtro,nombre_experimento)
+        return ruta_json
+
 
     def iniciar_experimento(self):
+        datos_filtro = self.leer_json_filtro(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "filter.json")
+        datos_detection = self.leer_json_detection(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "detection.json")
+        datos_temp = self.leer_json_temp(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "temp.json")
+        os.makedirs(self.obtener_ruta_experimento())
+
+        ruta_json = self.obtener_ruta_experimento_json()
+
+        datos_experimento = {}
+        datos_experimento.update(datos_filtro)
+        datos_experimento.update(datos_detection)
+        datos_experimento.update(datos_temp)
+
         with open(ruta_json, 'w') as file:
-            json.dump(datos_temp, file)
+            json.dump(datos_experimento, file)
+
+    
 
 
 
