@@ -11,7 +11,11 @@
     "min_radius": 19.0,
     "max_radius": 20.0,
     "polygon": 5.0,
-    "tempMax": 3.0,
-    "tempMin": 23.0,
-    "tempSet": 5.0
+    "v_drop": 0.0,
+    "v_wash": 0.0,
+    "dil_factor": 0.0,
+    "filter_fraction": 0.0,
+    "sampling_rate": 0.0,
+    "cooling_rate": 0.0,
+    "observations_exp": ""
 }

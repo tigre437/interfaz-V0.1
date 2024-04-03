@@ -50,6 +50,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.buttonCancelarFiltro.clicked.connect(self.cancelar_cambios_filtro)
         self.buttonIniciar.clicked.connect(self.iniciar_experimento)
 
+        self.tabWidget_2.currentChanged.connect(self.tab_changed)
+        self.checkBoxHabilitarA.stateChanged.connect(self.tab_changed)
+        self.checkBoxHabilitarB.stateChanged.connect(self.tab_changed)
+        self.checkBoxAmbasPlacas.stateChanged.connect(self.desactivar_placaB)
+
         self.buttonGuardarParamDetec.clicked.connect(self.guardar_datos_detection)
         self.buttonCancelarParamDetec.clicked.connect(self.cancelar_cambios_detect)
 
@@ -84,7 +89,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.dSpinBoxTempSet.valueChanged.connect(self.hSliderTempSet.setValue)
 
 
-        
+    def desactivar_placaB(self):
+        if self.checkBoxAmbasPlacas.isChecked():
+            print("adios")
+            self.checkBoxHabilitarB.setChecked(False)
+            self.checkBoxHabilitarB.setEnabled(False)
+        else:
+            print("hola")
+            self.checkBoxHabilitarB.setEnabled(True)
 
 
     def list_cameras(self):
@@ -205,18 +217,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             datos_filtro = self.leer_json_filtro(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "filter.json")
             if (datos_filtro != None):
                 self.rellenar_datos_filtro(datos_filtro)
-                print(datos_filtro)
 
             datos_detection = self.leer_json_detection(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "detection.json")
             if (datos_detection != None):
                 self.rellenar_datos_detection(datos_detection)
-                print(datos_detection)
 
             datos_temp = self.leer_json_temp(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "temp.json")
             if (datos_temp != None):
                 self.rellenar_datos_temp(datos_temp)
-                print(datos_temp)
-
     
 
     def cancelar_cambios_filtro(self):
@@ -224,21 +232,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         datos_filtro = self.leer_json_filtro(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "filter.json")
         if (datos_filtro != None):
             self.rellenar_datos_filtro(datos_filtro)
-            print(datos_filtro)
 
     def cancelar_cambios_detect(self):
         """Cancela la edición del filtro seleccionado."""
         datos_detection = self.leer_json_detection(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "detection.json")
         if (datos_detection != None):
             self.rellenar_datos_detection(datos_detection)
-            print(datos_detection)
 
     def cancelar_cambios_temp(self):
         """Cancela la edición del filtro seleccionado."""
         datos_temp = self.leer_json_temp(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "temp.json")
         if (datos_temp != None):
             self.rellenar_datos_temp(datos_temp)
-            print(datos_temp)
 
     def obtener_nombre_carpeta(self):
         """Abre un diálogo para ingresar el nombre de la carpeta."""
@@ -590,41 +595,90 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         """Obtiene la ruta completa del archivo JSON."""
         carpeta_seleccionada = self.txtArchivos.text()
         nombre_filtro = self.comboBoxFiltro.currentText()
-        nombre_experimento = self.txtNombrePlacaA.text()
+        fecha_actual = datetime.datetime.now().strftime("%Y%m%d")
+        hora_actual = datetime.datetime.now().strftime("%H%M")
 
+        nombre_experimento_con_fecha = f"{fecha_actual}_{hora_actual}_{self.txtNombrePlacaA.text()}_{self.tabWidget_2.tabText(self.tabWidget_2.currentIndex())}"
         
-        ruta_json = os.path.join(carpeta_seleccionada, nombre_filtro,nombre_experimento, "experimento.json")
+        ruta_json = os.path.join(carpeta_seleccionada, nombre_filtro, nombre_experimento_con_fecha, "experimento.json")
         return ruta_json
-    
+        
     def obtener_ruta_experimento(self):
         """Obtiene la ruta completa del archivo JSON."""
         carpeta_seleccionada = self.txtArchivos.text()
         nombre_filtro = self.comboBoxFiltro.currentText()
         nombre_experimento = self.txtNombrePlacaA.text()
 
-        
-        ruta_json = os.path.join(carpeta_seleccionada, nombre_filtro,nombre_experimento)
-        return ruta_json
+        fecha_actual = datetime.datetime.now().strftime("%Y%m%d")
+        hora_actual = datetime.datetime.now().strftime("%H%M")
 
+        nombre_experimento_con_fecha = f"{fecha_actual}_{hora_actual}_{nombre_experimento}_{self.tabWidget_2.tabText(self.tabWidget_2.currentIndex())}"
+        
+        ruta_experimento = os.path.join(carpeta_seleccionada, nombre_filtro, nombre_experimento_con_fecha)
+        return ruta_experimento
 
     def iniciar_experimento(self):
-        datos_filtro = self.leer_json_filtro(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "filter.json")
-        datos_detection = self.leer_json_detection(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "detection.json")
-        datos_temp = self.leer_json_temp(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "temp.json")
-        os.makedirs(self.obtener_ruta_experimento())
+        datos_filtro = self.leer_json_filtro(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "filter.json"))
+        datos_detection = self.leer_json_detection(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "detection.json"))
+        datos_exper = {
+            "v_drop": float(self.txtVDropPlacaA.text()),
+            "v_wash": float(self.txtVWashPlacaA.text()),
+            "dil_factor": float(self.txtFactorDilucPlacaA.text()),
+            "filter_fraction": float(self.txtFraccFiltroPlacaA.text()),
+            "sampling_rate": float(self.txtTasaMuestreoPlacaA.text()),
+            "cooling_rate": float(self.txtVelEnfriamientoPlacaA.text()),
+            "observations_exp": self.txtObservPlacaA.toPlainText()
+        }
+        
+        ruta_carpeta_experimento = self.obtener_ruta_experimento()
+
+        # Verificar si la carpeta del experimento ya existe
+        if not os.path.exists(ruta_carpeta_experimento):
+            os.makedirs(ruta_carpeta_experimento)  # Crear la carpeta del experimento si no existe
 
         ruta_json = self.obtener_ruta_experimento_json()
 
+        # Verificar si el archivo JSON ya existe y eliminarlo si es así
+        if os.path.exists(ruta_json):
+            respuesta = self.mostrar_dialogo_confirmacion("Sobreescribir experimento", "¿Estás seguro de que quieres sobreescribir los datos del experimento?")
+            if not respuesta:
+                return  
+            else:
+                os.remove(ruta_json)
+        
         datos_experimento = {}
         datos_experimento.update(datos_filtro)
         datos_experimento.update(datos_detection)
-        datos_experimento.update(datos_temp)
+        datos_experimento.update(datos_exper)
 
         with open(ruta_json, 'w') as file:
             json.dump(datos_experimento, file)
 
-    
 
+    def mostrar_dialogo_confirmacion(self, titulo, mensaje):
+        dialogo = QMessageBox()
+        dialogo.setWindowTitle(titulo)
+        dialogo.setText(mensaje)
+        dialogo.setIcon(QMessageBox.Icon.Question)
+        dialogo.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        dialogo.setDefaultButton(QMessageBox.StandardButton.No)
+        respuesta = dialogo.exec()
+        return respuesta == QMessageBox.StandardButton.Yes
+
+
+    def tab_changed(self):
+
+        index = self.tabWidget_2.currentIndex()
+        
+        if index is not None:
+            if index == 0:
+                self.buttonIniciar.setEnabled(False)
+            elif index == 1 and self.checkBoxHabilitarA.isChecked():
+                self.buttonIniciar.setEnabled(True)
+            elif index == 2 and self.checkBoxHabilitarB.isChecked():
+                self.buttonIniciar.setEnabled(True)
+            else:
+                self.buttonIniciar.setEnabled(False)
 
 
     @pyqtSlot(np.ndarray)
