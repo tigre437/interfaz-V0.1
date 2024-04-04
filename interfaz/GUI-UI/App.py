@@ -94,9 +94,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             print("adios")
             self.checkBoxHabilitarB.setChecked(False)
             self.checkBoxHabilitarB.setEnabled(False)
+            self.copiarDatosA()
         else:
             print("hola")
             self.checkBoxHabilitarB.setEnabled(True)
+
+    def copiarDatosA(self):
+        self.txtNombrePlacaB.setText(self.txtNombrePlacaA.text())
+        self.txtVDropPlacaB.setText(self.txtVDropPlacaA.text())
+        self.txtVWashPlacaB.setText(self.txtVWashPlacaA.text())
+        self.txtFactorDilucPlacaB.setText(self.txtFactorDilucPlacaA.text())
+        self.txtFraccFiltroPlacaB.setText(self.txtFraccFiltroPlacaA.text())
+        self.txtTasaMuestreoPlacaB.setText(self.txtTasaMuestreoPlacaA.text())
+        self.txtVelEnfriamientoPlacaB.setText(self.txtVelEnfriamientoPlacaA.text())
+        self.txtObservPlacaB.setPlainText(self.txtObservPlacaA.toPlainText())
 
 
     def list_cameras(self):
@@ -598,7 +609,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         fecha_actual = datetime.datetime.now().strftime("%Y%m%d")
         hora_actual = datetime.datetime.now().strftime("%H%M")
 
-        nombre_experimento_con_fecha = f"{fecha_actual}_{hora_actual}_{self.txtNombrePlacaA.text()}_{self.tabWidget_2.tabText(self.tabWidget_2.currentIndex())}"
+        placa = self.tabWidget_2.tabText(self.tabWidget_2.currentIndex())
+        if (placa == "Placa A"):
+            nombre_experimento = self.txtNombrePlacaA.text()
+        else:
+            nombre_experimento = self.txtNombrePlacaB.text()
+
+        nombre_experimento_con_fecha = f"{fecha_actual}_{hora_actual}_{nombre_experimento}_{self.tabWidget_2.tabText(self.tabWidget_2.currentIndex())}"
+        if (not self.checkBoxAmbasPlacas.isChecked()):
+            nombre_experimento_con_fecha = f"{fecha_actual}_{hora_actual}_{nombre_experimento}_{self.tabWidget_2.tabText(self.tabWidget_2.currentIndex())}"
+        else:
+            nombre_experimento_con_fecha = f"{fecha_actual}_{hora_actual}_{self.txtNombrePlacaA.text()}_Placa_AB"
         
         ruta_json = os.path.join(carpeta_seleccionada, nombre_filtro, nombre_experimento_con_fecha, "experimento.json")
         return ruta_json
@@ -607,12 +628,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         """Obtiene la ruta completa del archivo JSON."""
         carpeta_seleccionada = self.txtArchivos.text()
         nombre_filtro = self.comboBoxFiltro.currentText()
-        nombre_experimento = self.txtNombrePlacaA.text()
+        placa = self.tabWidget_2.tabText(self.tabWidget_2.currentIndex())
+        if (placa == "Placa A"):
+            nombre_experimento = self.txtNombrePlacaA.text()
+        else:
+            nombre_experimento = self.txtNombrePlacaB.text()
 
         fecha_actual = datetime.datetime.now().strftime("%Y%m%d")
         hora_actual = datetime.datetime.now().strftime("%H%M")
 
-        nombre_experimento_con_fecha = f"{fecha_actual}_{hora_actual}_{nombre_experimento}_{self.tabWidget_2.tabText(self.tabWidget_2.currentIndex())}"
+        if (not self.checkBoxAmbasPlacas.isChecked()):
+            nombre_experimento_con_fecha = f"{fecha_actual}_{hora_actual}_{nombre_experimento}_{placa}"
+        else:
+            nombre_experimento_con_fecha = f"{fecha_actual}_{hora_actual}_{self.txtNombrePlacaA.text()}_Placa_AB"
         
         ruta_experimento = os.path.join(carpeta_seleccionada, nombre_filtro, nombre_experimento_con_fecha)
         return ruta_experimento
@@ -620,7 +648,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def iniciar_experimento(self):
         datos_filtro = self.leer_json_filtro(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "filter.json"))
         datos_detection = self.leer_json_detection(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "detection.json"))
-        datos_exper = {
+        placa = self.tabWidget_2.tabText(self.tabWidget_2.currentIndex())
+        if (placa == "Placa A"):
+            datos_exper = {
             "v_drop": float(self.txtVDropPlacaA.text()),
             "v_wash": float(self.txtVWashPlacaA.text()),
             "dil_factor": float(self.txtFactorDilucPlacaA.text()),
@@ -628,6 +658,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             "sampling_rate": float(self.txtTasaMuestreoPlacaA.text()),
             "cooling_rate": float(self.txtVelEnfriamientoPlacaA.text()),
             "observations_exp": self.txtObservPlacaA.toPlainText()
+        }
+        else:
+            datos_exper = {
+            "v_drop": float(self.txtVDropPlacaB.text()),
+            "v_wash": float(self.txtVWashPlacaB.text()),
+            "dil_factor": float(self.txtFactorDilucPlacaB.text()),
+            "filter_fraction": float(self.txtFraccFiltroPlacaB.text()),
+            "sampling_rate": float(self.txtTasaMuestreoPlacaB.text()),
+            "cooling_rate": float(self.txtVelEnfriamientoPlacaB.text()),
+            "observations_exp": self.txtObservPlacaB.toPlainText()
         }
         
         ruta_carpeta_experimento = self.obtener_ruta_experimento()

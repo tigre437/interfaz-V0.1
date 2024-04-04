@@ -1002,6 +1002,9 @@
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
+                   <property name="text">
+                    <string>0.0</string>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -1058,6 +1061,9 @@
                   <widget class="QLineEdit" name="txtVWashPlacaB">
                    <property name="enabled">
                     <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>0.0</string>
                    </property>
                   </widget>
                  </item>
@@ -1116,6 +1122,9 @@
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
+                   <property name="text">
+                    <string>0.0</string>
+                   </property>
                   </widget>
                  </item>
                 </layout>
@@ -1154,6 +1163,9 @@
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
+                   <property name="text">
+                    <string>0.0</string>
+                   </property>
                   </widget>
                  </item>
                 </layout>
@@ -1191,6 +1203,9 @@
                   <widget class="QLineEdit" name="txtTasaMuestreoPlacaB">
                    <property name="enabled">
                     <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>0.0</string>
                    </property>
                   </widget>
                  </item>
@@ -1248,6 +1263,9 @@
                   <widget class="QLineEdit" name="txtVelEnfriamientoPlacaB">
                    <property name="enabled">
                     <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>0.0</string>
                    </property>
                   </widget>
                  </item>
