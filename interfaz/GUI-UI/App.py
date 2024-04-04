@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
     QFileDialog, QDialog, QLabel, QLineEdit,
     QPushButton, QVBoxLayout, QMessageBox, QGraphicsProxyWidget
 )
-from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, Qt, QObject
+from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, Qt, QObject, QTimer
 from PyQt6.QtGui import QPixmap, QImage, QTransform
 from interfazv1 import Ui_MainWindow  # Importa la interfaz de la ventana principal
 from pygrabber.dshow_graph import FilterGraph
@@ -60,7 +60,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.buttonGuardarParamTemp.clicked.connect(self.guardar_datos_temp)
         self.buttonCancelarParamTemp.clicked.connect(self.cancelar_cambios_temp)
-        self.pintar_grafica()
 
         #self.buttonIniciar.clicked.connect(self.iniciar_expermiento)
         
@@ -88,6 +87,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.dSpinBoxTempMax.valueChanged.connect(self.hSliderTempMax.setValue)
         self.dSpinBoxTempSet.valueChanged.connect(self.hSliderTempSet.setValue)
 
+        #Aqui hay que setear de primeras las temperaturas de los liquidos
+        #self.pintar_grafica(temp_bloc, temp_liquid, temp_set)
+        
+        
+        # Timer de la grafica
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.actualizar_grafica)
+        self.timer.start(1000)
+
+        self.buttonConectarTermo.clicked.connect(self.detener_timer)
+
+    def detener_timer(self):
+        self.timer.stop()
 
     def desactivar_placaB(self):
         if self.checkBoxAmbasPlacas.isChecked():
@@ -569,21 +582,29 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
 
     ######################## GRAFICA ####################################
-    
-    def pintar_grafica(self):
-        """Pinta una gráfica utilizando PyQtGraph y la muestra en un QGraphicsView."""
-        # Crear datos de ejemplo
-        x = np.linspace(0, 10, 100)
-        y = np.sin(x)
 
+    def actualizar_grafica(self):
+
+
+        temperatura_bloque = [20, 25, 30, 28, 27, 26, 25, 24, 23, 22]
+        temperatura_liquido = [22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
+        temperatura_consigna = [25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
+        self.pintar_grafica(temperatura_bloque, temperatura_liquido, temperatura_consigna)
+    
+    def pintar_grafica(self, temperatura_bloque, temperatura_liquido, temperatura_consigna):
+        """Pinta una gráfica utilizando PyQtGraph y la muestra en un QGraphicsView."""
         # Crear un widget de gráfico
         self.plot_widget = pg.PlotWidget()
 
-        # Agregar el gráfico al widget
-        self.plot_widget.plot(x, y, pen=pg.mkPen(color='w'))  # Color de la línea
+        # Agregar las líneas de la gráfica
+        self.plot_widget.plot(temperatura_bloque, pen=pg.mkPen(color='r'), name='Temperatura Bloque')  # Línea roja para la temperatura del bloque
+        self.plot_widget.plot(temperatura_liquido, pen=pg.mkPen(color='b'), name='Temperatura Líquido')  # Línea azul para la temperatura del líquido
+        self.plot_widget.plot(temperatura_consigna, pen=pg.mkPen(color='#939393'), name='Temperatura Consigna')  # Línea gris claro para la temperatura de consigna
+
+        # Personalizar la apariencia del gráfico
         self.plot_widget.setBackground('k')  # Color de fondo
-        self.plot_widget.setTitle('Rampa de enfriamiento', color='w')  # Color del título
-        self.plot_widget.showGrid(x=True, y=True, alpha=0.6)  # Mostrar rejilla
+        self.plot_widget.setTitle('Rampa de enfriamiento')  # Título
+        self.plot_widget.showGrid(x=True, y=True, alpha=0.2)  # Mostrar rejilla
         self.plot_widget.getAxis('bottom').setPen(pg.mkPen(color='w'))  # Color del eje x
         self.plot_widget.getAxis('left').setPen(pg.mkPen(color='w'))  # Color del eje y
         self.plot_widget.getAxis('bottom').setTextPen('w')  # Color de los números en el eje x
@@ -651,24 +672,24 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         placa = self.tabWidget_2.tabText(self.tabWidget_2.currentIndex())
         if (placa == "Placa A"):
             datos_exper = {
-            "v_drop": float(self.txtVDropPlacaA.text()),
-            "v_wash": float(self.txtVWashPlacaA.text()),
-            "dil_factor": float(self.txtFactorDilucPlacaA.text()),
-            "filter_fraction": float(self.txtFraccFiltroPlacaA.text()),
-            "sampling_rate": float(self.txtTasaMuestreoPlacaA.text()),
-            "cooling_rate": float(self.txtVelEnfriamientoPlacaA.text()),
-            "observations_exp": self.txtObservPlacaA.toPlainText()
-        }
+                "v_drop": float(self.txtVDropPlacaA.text()),
+                "v_wash": float(self.txtVWashPlacaA.text()),
+                "dil_factor": float(self.txtFactorDilucPlacaA.text()),
+                "filter_fraction": float(self.txtFraccFiltroPlacaA.text()),
+                "sampling_rate": float(self.txtTasaMuestreoPlacaA.text()),
+                "cooling_rate": float(self.txtVelEnfriamientoPlacaA.text()),
+                "observations_exp": self.txtObservPlacaA.toPlainText()
+            }
         else:
             datos_exper = {
-            "v_drop": float(self.txtVDropPlacaB.text()),
-            "v_wash": float(self.txtVWashPlacaB.text()),
-            "dil_factor": float(self.txtFactorDilucPlacaB.text()),
-            "filter_fraction": float(self.txtFraccFiltroPlacaB.text()),
-            "sampling_rate": float(self.txtTasaMuestreoPlacaB.text()),
-            "cooling_rate": float(self.txtVelEnfriamientoPlacaB.text()),
-            "observations_exp": self.txtObservPlacaB.toPlainText()
-        }
+                "v_drop": float(self.txtVDropPlacaB.text()),
+                "v_wash": float(self.txtVWashPlacaB.text()),
+                "dil_factor": float(self.txtFactorDilucPlacaB.text()),
+                "filter_fraction": float(self.txtFraccFiltroPlacaB.text()),
+                "sampling_rate": float(self.txtTasaMuestreoPlacaB.text()),
+                "cooling_rate": float(self.txtVelEnfriamientoPlacaB.text()),
+                "observations_exp": self.txtObservPlacaB.toPlainText()
+            }
         
         ruta_carpeta_experimento = self.obtener_ruta_experimento()
 
