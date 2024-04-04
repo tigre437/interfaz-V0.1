@@ -8,11 +8,12 @@ from PyQt6.QtWidgets import (
     QFileDialog, QDialog, QLabel, QLineEdit,
     QPushButton, QVBoxLayout, QMessageBox, QGraphicsProxyWidget
 )
-from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, Qt, QObject, QTimer
+from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, Qt, QObject, QTimer, QSemaphore
 from PyQt6.QtGui import QPixmap, QImage, QTransform
 from interfazv1 import Ui_MainWindow  # Importa la interfaz de la ventana principal
 from pygrabber.dshow_graph import FilterGraph
 import datetime
+import time
 
 
 
@@ -35,6 +36,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Instancia del hilo para captura de video
         self.thread = VideoThread()
+        self.semaphore = QSemaphore(1)
 
         # Llena el combobox de cámaras disponibles
         self.fillCameras()
@@ -89,13 +91,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         #Aqui hay que setear de primeras las temperaturas de los liquidos
         #self.pintar_grafica(temp_bloc, temp_liquid, temp_set)
+
+
         
         
         # Timer de la grafica
 
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.actualizar_grafica)
-        self.timer.start(1000)
+        self.capture_thread = ImageCaptureThread()
+        self.capture_thread.start()
+
+        #self.timer = QTimer(self)
+        #self.timer.timeout.connect(self.actualizar_grafica)
+        #self.timer.start(2000)
+
+        # CADA TIMER SE AÑADE UN VALOR A LAS LISTAS DE DATO
 
         self.buttonConectarTermo.clicked.connect(self.detener_timer)
 
@@ -104,12 +113,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def desactivar_placaB(self):
         if self.checkBoxAmbasPlacas.isChecked():
-            print("adios")
             self.checkBoxHabilitarB.setChecked(False)
             self.checkBoxHabilitarB.setEnabled(False)
             self.copiarDatosA()
         else:
-            print("hola")
             self.checkBoxHabilitarB.setEnabled(True)
 
     def copiarDatosA(self):
@@ -121,7 +128,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.txtTasaMuestreoPlacaB.setText(self.txtTasaMuestreoPlacaA.text())
         self.txtVelEnfriamientoPlacaB.setText(self.txtVelEnfriamientoPlacaA.text())
         self.txtObservPlacaB.setPlainText(self.txtObservPlacaA.toPlainText())
-
 
     def list_cameras(self):
         """Obtiene una lista de cámaras disponibles."""
@@ -158,6 +164,37 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             QMessageBox.critical(self, "Error", "No se ha seleccionado ninguna cámara.", QMessageBox.StandardButton.Ok)
         else:
             self.thread.settings()
+
+    def capture_and_save(dividir=True):
+        # Capturar imagen desde la cámara
+        captura = cv2.VideoCapture(0)  # 0 para la cámara predeterminada, puedes cambiar el valor si tienes varias cámaras
+        ret, frame = captura.read()  # Capturar un solo fotograma
+
+        if ret and dividir:
+            # Dividir la imagen por la mitad horizontalmente
+            altura, ancho, _ = frame.shape
+            mitad_horizontal = ancho // 2
+            mitad_frame_izquierda = frame[:, :mitad_horizontal]
+            mitad_frame_derecha = frame[:, mitad_horizontal:]
+
+            # Guardar las mitades de la imagen
+            cv2.imwrite((f"{datetime.datetime.now().strftime('%H%M%S')}_A.jpg"), mitad_frame_izquierda)
+            cv2.imwrite((f"{datetime.datetime.now().strftime('%H%M%S')}_B.jpg"), mitad_frame_derecha)
+
+            # Liberar la captura
+            captura.release()
+
+            print("Fotogramas guardados correctamente.")
+        elif ret:
+            # Guardar las mitades de la imagen
+            cv2.imwrite((f"{datetime.datetime.now().strftime('%H%M%S')}_AB.jpg"), frame)
+
+            # Liberar la captura
+            captura.release()
+
+            print("Fotogramas guardados correctamente.")
+        else:
+            print("Error al capturar el fotograma.")
 
     def cambiarPlacaA(self):
         """Habilita o deshabilita campos según el estado del checkbox."""
@@ -249,7 +286,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             datos_temp = self.leer_json_temp(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "temp.json")
             if (datos_temp != None):
                 self.rellenar_datos_temp(datos_temp)
-    
 
     def cancelar_cambios_filtro(self):
         """Cancela la edición del filtro seleccionado."""
@@ -432,8 +468,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         QMessageBox.information(self, "Guardado", "Los datos del filtro se han actualizado correctamente.", QMessageBox.StandardButton.Ok)
 
-
-
     def leer_json_detection(self, archivo_json):
         """Lee un archivo JSON de detección y devuelve los datos relevantes."""
         try:
@@ -507,7 +541,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         QMessageBox.information(self, "Guardado", "Los datos de detección se han actualizado correctamente.", QMessageBox.StandardButton.Ok)
 
-
     def leer_json_temp(self, archivo_json):
         """Lee un archivo JSON de temperatura y devuelve los datos relevantes."""
         try:
@@ -569,27 +602,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         QMessageBox.information(self, "Guardado", "Los datos de temperatura se han actualizado correctamente.", QMessageBox.StandardButton.Ok)
 
-
-
-
     def obtener_ruta_json(self, archivo):
         """Obtiene la ruta completa del archivo JSON."""
         carpeta_seleccionada = self.txtArchivos.text()
         nombre_filtro = self.comboBoxFiltro.currentText()
         ruta_json = os.path.join(carpeta_seleccionada, nombre_filtro, archivo)
         return ruta_json
-    
 
 
     ######################## GRAFICA ####################################
 
     def actualizar_grafica(self):
 
-
-        temperatura_bloque = [20, 25, 30, 28, 27, 26, 25, 24, 23, 22]
-        temperatura_liquido = [22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
-        temperatura_consigna = [25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
-        self.pintar_grafica(temperatura_bloque, temperatura_liquido, temperatura_consigna)
+        self.capture_and_save()
+        #temperatura_bloque = [20, 25, 30, 28, 27, 26, 25, 24, 23, 22]
+        #temperatura_liquido = [22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
+        #temperatura_consigna = [25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
+        #self.pintar_grafica(temperatura_bloque, temperatura_liquido, temperatura_consigna)
     
     def pintar_grafica(self, temperatura_bloque, temperatura_liquido, temperatura_consigna):
         """Pinta una gráfica utilizando PyQtGraph y la muestra en un QGraphicsView."""
@@ -715,7 +744,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         with open(ruta_json, 'w') as file:
             json.dump(datos_experimento, file)
 
-
     def mostrar_dialogo_confirmacion(self, titulo, mensaje):
         dialogo = QMessageBox()
         dialogo.setWindowTitle(titulo)
@@ -725,7 +753,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         dialogo.setDefaultButton(QMessageBox.StandardButton.No)
         respuesta = dialogo.exec()
         return respuesta == QMessageBox.StandardButton.Yes
-
 
     def tab_changed(self):
 
@@ -740,7 +767,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.buttonIniciar.setEnabled(True)
             else:
                 self.buttonIniciar.setEnabled(False)
-
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
@@ -774,20 +800,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.datetime.setText(f'{datetime.datetime.now():%m/%d/%Y %H:%M:%S}')
 
 class VideoThread(QThread):
-    change_pixmap_signal = pyqtSignal(np.ndarray)
+    change_pixmap_signal = pyqtSignal(object)
 
     def __init__(self):
         super().__init__()
         self.cap = None
         self._run_flag = True
+        self.lock = QSemaphore(1)  # Semáforo para controlar el acceso al hilo de video
 
     def run(self):
         """Inicia el hilo para la captura de video."""
-        self.cap = cv2.VideoCapture(self.camera_index, cv2.CAP_DSHOW)
+        self.cap = cv2.VideoCapture(0)
         while self._run_flag:
             ret, cv_img = self.cap.read()
             if ret:
+                self.lock.acquire()  # Bloquea el acceso al hilo de video
                 self.change_pixmap_signal.emit(cv_img)
+                self.lock.release()  # Libera el acceso al hilo de video
         self.cap.release()
 
     def stop(self):
@@ -799,15 +828,48 @@ class VideoThread(QThread):
         """Abre la configuración de la cámara."""
         self.cap.set(cv2.CAP_PROP_SETTINGS, 1)
 
-    def save(self):
-        """Guarda la imagen capturada."""
-        ret, cv_img = self.cap.read()
-        if ret:
-            cv2.imwrite(r'C:\Users\david\Desktop\interfaz-V0.1\imagenes-prueba', cv_img)
-
     def set_camera_index(self, index):
         """Establece el índice del dispositivo de captura."""
-        self.camera_index = index
+        self.cap = cv2.VideoCapture(index)
+
+
+class ImageCapture(QObject):
+    imageCaptured = pyqtSignal(object)
+
+    def __init__(self):
+        super().__init__()
+        self.lock = QSemaphore(1)  # Semáforo para controlar el acceso al hilo de captura de imágenes
+
+    def capture_image(self):
+        # Captura una imagen de la cámara
+        capture = cv2.VideoCapture(0)
+        ret, frame = capture.read()
+        capture.release()
+
+        if ret:
+            self.lock.acquire()  # Bloquea el acceso al hilo de captura de imágenes
+            self.imageCaptured.emit(frame)
+            self.lock.release()  # Libera el acceso al hilo de captura de imágenes
+
+
+class ImageCaptureThread(QThread):
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        self.capture = ImageCapture()
+        self.capture.moveToThread(QThread.currentThread())  # Mueve al hilo actual
+        self.capture.imageCaptured.connect(self.image_captured)
+
+        while True:
+            self.capture.capture_image()
+            time.sleep(2)  # Captura una imagen cada 2 segundos
+
+    def image_captured(self, frame):
+        # Procesa la imagen capturada aquí, por ejemplo, guárdala en un archivo
+        if frame is not None:
+            current_time = datetime.datetime.now().strftime('%H%M%S')
+            cv2.imwrite(f"{current_time}.jpg", frame)
 
 # Creación de la aplicación y ventana principal
 app = QtWidgets.QApplication([])
