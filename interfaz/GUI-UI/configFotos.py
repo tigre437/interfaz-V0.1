@@ -55,7 +55,7 @@ class Ui_Dialog(object):
         self.horizontalLayout_2.addWidget(self.doubleSpinBox)
         self.checkBox = QtWidgets.QCheckBox(parent=self.frame_3)
         self.checkBox.setMaximumSize(QtCore.QSize(86, 16777215))
-        self.checkBox.setToolTip("")
+        self.checkBox.setToolTip("Si se desactiva se empezaran a hacer fotos cuando se inicie el experimento")
         self.checkBox.setObjectName("checkBox")
         self.horizontalLayout_2.addWidget(self.checkBox)
         self.verticalLayout.addWidget(self.frame_3)
