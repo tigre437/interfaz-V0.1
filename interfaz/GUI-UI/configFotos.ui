@@ -101,7 +101,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string extracomment="Si se desactiva se usara la temperatura set"/>
+             <string extracomment="Si se desactiva se empezaran a hacer fotos cuando se inicie el experimento"/>
             </property>
             <property name="text">
              <string>Desactivado</string>
