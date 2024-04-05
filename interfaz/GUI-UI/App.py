@@ -483,7 +483,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         """Guarda los datos de la cámara en un archivo JSON."""
         # Obtener los datos de los campos de texto del diálogo
         frecuencia = self.dialog.ui.labelFrecuencia.text()
-        print(frecuencia)
         habilitado = self.dialog.ui.checkBox.isChecked()
         temp_set = self.dialog.ui.doubleSpinTemp.value()
 
