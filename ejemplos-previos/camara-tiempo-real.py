@@ -38,7 +38,7 @@ class VideoThread(QThread):
     def save(self):
         ret, cv_img = self.cap.read()
         if ret:
-            cv2.imwrite(r'G:\Mi unidad\code\qt\image.jpg', cv_img)
+            cv2.imwrite("image.jpg", cv_img)
 
 
 class App(QWidget):
