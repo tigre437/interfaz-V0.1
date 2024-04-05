@@ -1485,7 +1485,20 @@
                     </size>
                    </property>
                    <property name="text">
-                    <string>Configuración</string>
+                    <string>Config. Video</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="buttonConfiguracionExper">
+                   <property name="maximumSize">
+                    <size>
+                     <width>120</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Config. Experimento</string>
                    </property>
                   </widget>
                  </item>

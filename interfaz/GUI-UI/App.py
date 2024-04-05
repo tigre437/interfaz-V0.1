@@ -13,6 +13,7 @@ from PyQt6.QtGui import QPixmap, QTransform
 from interfazv1 import Ui_MainWindow  # Importa la interfaz de la ventana principal
 from pygrabber.dshow_graph import FilterGraph
 import datetime
+from configFotos import Ui_Dialog
 
 
 
@@ -21,6 +22,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)  # Configura la interfaz gráfica definida en Ui_MainWindow
+
+
+        # Crear una instancia del diálogo y almacenarla como un atributo de instancia
+        self.dialog = QtWidgets.QDialog()
+        self.dialog.ui = Ui_Dialog()
+        self.dialog.ui.setupUi(self.dialog)
+
+        # Conectar el botón de aceptar del cuadro de diálogo a la función guardar_datos_camara
+        self.dialog.ui.buttonBox.accepted.connect(self.guardar_datos_camara)
 
 
         self.thread = VideoThread()
@@ -62,6 +72,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.buttonGuardarParamTemp.clicked.connect(self.guardar_datos_temp)
         self.buttonCancelarParamTemp.clicked.connect(self.cancelar_cambios_temp)
+
+        self.buttonConfiguracionExper.clicked.connect(self.open_dialog)
 
         #self.buttonIniciar.clicked.connect(self.iniciar_expermiento)
         
@@ -106,6 +118,31 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def detener_timer(self):
         self.timer.stop()
+
+    def open_dialog(self):
+        # Ruta al archivo camera.json
+        ruta_camera_json = self.obtener_ruta_json("camera.json")
+
+        # Verificar si el archivo existe
+        if os.path.exists(ruta_camera_json):
+            # Leer el archivo y obtener los datos de la cámara
+            datos_camara = self.leer_json_camara(ruta_camera_json)
+        else:
+            # Si el archivo no existe, crearlo con valores predeterminados
+            self.crear_json_camara(os.path.dirname(ruta_camera_json))
+            datos_camara = {
+                'frecuencia': 2,
+                'habilitado': True,
+                'temp_set': -3
+            }
+
+        # Rellenar los campos del diálogo con los datos de la cámara
+        self.dialog.ui.labelFrecuencia.setText(str(datos_camara['frecuencia']))
+        self.dialog.ui.checkBox.setChecked(datos_camara['habilitado'])
+        self.dialog.ui.doubleSpinTemp.setValue(datos_camara['temp_set'])
+
+        # Mostrar el diálogo
+        self.dialog.exec()
 
     def desactivar_placaB(self):
         if self.checkBoxAmbasPlacas.isChecked():
@@ -398,6 +435,75 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             json.dump(datos_filtro, file)
 
         QMessageBox.information(self, "Guardado", "Los datos del filtro se han actualizado correctamente.", QMessageBox.StandardButton.Ok)
+
+
+
+    def leer_json_camara(self, archivo_json):
+        """Lee un archivo JSON y devuelve los datos relevantes."""
+        try:
+            with open(archivo_json, 'r') as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            QMessageBox.warning(self, "Advertencia", f"El archivo '{archivo_json}' no existe.", QMessageBox.StandardButton.Ok)
+            return
+        except json.JSONDecodeError:
+            QMessageBox.warning(self, "Advertencia", f"El archivo '{archivo_json}' no es un archivo JSON válido.", QMessageBox.StandardButton.Ok)
+            return
+
+        frecuencia = data.get('frecuencia', 2)
+        habilitado = data.get('habilitado', True)
+        temp_set = data.get('temp_set', -3)
+
+        return {
+            'frecuencia': frecuencia,
+            'habilitado': habilitado,
+            'temp_set': temp_set
+        }
+
+    def rellenar_datos_camara(self, datos):
+        """Asigna los valores correspondientes a cada campo de texto."""
+        self.labelFrecuencia.setText(str(datos['frecuencia']))
+        self.checkBox.setChecked(datos['habilitado'])
+        self.doubleSpinTemp.setValue(datos['temp_set'])
+
+    def crear_json_camara(self, ruta_carpeta_sns):
+        """Crea el archivo camera.json."""
+        ruta_camera_json = os.path.join(ruta_carpeta_sns, 'camera.json')
+        with open(ruta_camera_json, 'w') as file:
+            json.dump(
+                {
+                    "Frec": 2,
+                    "habilitado": True,
+                    "Temp_Set": -3
+                },
+                file
+            )
+
+    def guardar_datos_camara(self):
+        """Guarda los datos de la cámara en un archivo JSON."""
+        # Obtener los datos de los campos de texto del diálogo
+        frecuencia = self.dialog.ui.labelFrecuencia.text()
+        print(frecuencia)
+        habilitado = self.dialog.ui.checkBox.isChecked()
+        temp_set = self.dialog.ui.doubleSpinTemp.value()
+
+        # Crear un diccionario con los datos
+        datos_camara = {
+            'frecuencia': frecuencia,
+            'habilitado': habilitado,
+            'temp_set': temp_set
+        }
+
+        # Obtener la ruta del archivo camera.json
+        ruta_camera_json = self.obtener_ruta_json("camera.json")
+
+        # Guardar los nuevos datos en el archivo camera.json
+        with open(ruta_camera_json, 'w') as file:
+            json.dump(datos_camara, file)
+
+        # Informar al usuario que los datos han sido guardados correctamente
+        QtWidgets.QMessageBox.information(self, "Guardado", "Los datos de la cámara se han actualizado correctamente.", QtWidgets.QMessageBox.StandardButton.Ok)
+
 
 
 

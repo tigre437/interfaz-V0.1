@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Configuracion de Camara</string>
   </property>
   <widget class="QFrame" name="frame_4">
    <property name="geometry">
@@ -61,7 +61,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEdit"/>
+           <widget class="QLineEdit" name="labelFrecuencia"/>
           </item>
          </layout>
         </widget>
@@ -83,12 +83,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="doubleSpinBox">
+           <widget class="QDoubleSpinBox" name="doubleSpinTemp">
             <property name="maximumSize">
              <size>
               <width>16777215</width>
               <height>16777215</height>
              </size>
+            </property>
+            <property name="minimum">
+             <double>-999900000.000000000000000</double>
             </property>
            </widget>
           </item>
