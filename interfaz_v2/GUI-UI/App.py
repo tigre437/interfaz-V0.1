@@ -802,6 +802,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             json.dump(datos_experimento, file)
 
         self.buttonParar.setEnabled(True)
+        global parar
+        parar = False
 
     def pararExperimento(self):
         global parar
@@ -894,7 +896,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if (self.dSpinBoxTempSet.value() == datos_camara['temp_set']):
                 print("if")
                 time.sleep(int(datos_camara['frecuencia']))
-                self.thread.save(ruta_imagenes)
+                self.thread.save(ruta_imagenes, self.tabWidget_2.tabText(self.tabWidget_2.currentIndex()))
             else:
                 print("else")
                 time.sleep(int(datos_camara['frecuencia']))
@@ -970,9 +972,7 @@ class VideoThread(QThread):
     def settings(self):
         self.cap.set(cv2.CAP_PROP_SETTINGS, 1)
 
-    def save(self, ruta_experimento):
-        
-        
+    def save(self, ruta_experimento, area):
         # Obtener la fecha y hora actual
         now = datetime.datetime.now()
 
@@ -981,8 +981,17 @@ class VideoThread(QThread):
 
         ret, cv_img = self.cap.read()
         if ret:
+            height, width, _ = cv_img.shape
+            if area == 'Placa A':
+                cv_img = cv_img[:, :width // 2]  # Recortar la mitad izquierda de la imagen
+            elif area == 'Placa B':
+                cv_img = cv_img[:, width // 2:]  # Recortar la mitad derecha de la imagen
+            
             # Guardar la imagen en la carpeta "imagenes"
-            cv2.imwrite(os.path.join(ruta_experimento, f"{timestamp}.jpg"), cv_img)
+            cv2.imwrite(os.path.join(f"{ruta_experimento}/imagenes", f"{timestamp}.jpg"), cv_img)
+        else:
+            print("Error al capturar la imagen. No se guardará.")
+
 
     def set_camera_index(self, index):
         """Establece el índice del dispositivo de captura"""
