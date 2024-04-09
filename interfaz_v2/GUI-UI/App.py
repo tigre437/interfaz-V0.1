@@ -15,6 +15,7 @@ from interfazv1 import Ui_MainWindow  # Importa la interfaz de la ventana princi
 from pygrabber.dshow_graph import FilterGraph
 import datetime
 from configFotos import Ui_Dialog
+import threading
 
 
 ruta_experimento_activo = None
@@ -37,7 +38,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
 
         self.thread = VideoThread(MainWindow)
-        self.threadSave = SaveThread(MainWindow)
 
 
         # Graficas
@@ -876,7 +876,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         datos_camara = self.leer_json_camara(self.obtener_ruta_json("camera.json"))
         
-        self.threadSave.save(ruta_imagenes, datos_camara)
+        h1 = threading.Thread(name="guardado_imagenes", target=self.thread.save, args=(ruta_experimento_activo, ))
+    def comprobar_fotos(self):
+        global parar
+        while not parar:
+            if (self.dSpinBoxTempSet.value() == self.datos_camara['temp_set']):
+                time.sleep(int(self.datos_camara['frecuencia']))
+                self.thread.save(self.ruta_imagenes)
+            else:
+                time.sleep(int(self.datos_camara['frecuencia']))
 
     @pyqtSlot(np.ndarray)
 
@@ -967,23 +975,6 @@ class VideoThread(QThread):
         self.camera_index = index
 
 
-class SaveThread(QThread):
-    def __init__(self, parent=None):
-        super().__init__()
-        self.parar = False
-
-    def run(self, ruta_imagenes, datos_camara):
-        global parar
-        while not parar:
-            if (self.dSpinBoxTempSet.value() == datos_camara['temp_set']):
-                time.sleep(int(datos_camara['frecuencia']))
-                self.thread.save(ruta_imagenes)
-            else:
-                time.sleep(int(datos_camara['frecuencia']))
-
-    def detener(self):
-        self.parar = True
-        self.wait()  # Espera a que el hilo termine antes de salir
 
 # Creación de la aplicación y ventana principal
 app = QtWidgets.QApplication([])

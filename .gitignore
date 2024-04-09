@@ -4,3 +4,9 @@ interfaz/Include/
 interfaz/Scripts/
 interfaz/share
 interfaz/GUI-UI/__pycache__
+
+interfaz_v2/Lib/
+interfaz_v2/Include/
+interfaz_v2/Scripts/
+interfaz_v2/share
+interfaz_v2/GUI-UI/__pycache__
