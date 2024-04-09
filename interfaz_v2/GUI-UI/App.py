@@ -801,6 +801,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         with open(ruta_json, 'w') as file:
             json.dump(datos_experimento, file)
 
+        self.buttonParar.setEnabled(True)
+
     def pararExperimento(self):
         global parar
         parar = True
@@ -875,16 +877,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             os.makedirs(ruta_imagenes)
 
         datos_camara = self.leer_json_camara(self.obtener_ruta_json("camera.json"))
-        
-        h1 = threading.Thread(name="guardado_imagenes", target=self.thread.save, args=(ruta_experimento_activo, ))
-    def comprobar_fotos(self):
+        print("2")
+        h1 = threading.Thread(name="guardado_imagenes", target=self.comprobar_fotos, args=(ruta_experimento_activo, datos_camara))
+        print("3")
+        h1.start()
+        print("4")
+
+
+    def comprobar_fotos(self, ruta_imagenes, datos_camara):
         global parar
+        print("!")
         while not parar:
-            if (self.dSpinBoxTempSet.value() == self.datos_camara['temp_set']):
-                time.sleep(int(self.datos_camara['frecuencia']))
-                self.thread.save(self.ruta_imagenes)
+            print("entro en el bucle")
+            print(f"temperatura: {datos_camara['temp_set']}")
+            print(f"valor spinbox:{self.dSpinBoxTempSet.value()}")
+            if (self.dSpinBoxTempSet.value() == datos_camara['temp_set']):
+                print("if")
+                time.sleep(int(datos_camara['frecuencia']))
+                self.thread.save(ruta_imagenes)
             else:
-                time.sleep(int(self.datos_camara['frecuencia']))
+                print("else")
+                time.sleep(int(datos_camara['frecuencia']))
+
 
     @pyqtSlot(np.ndarray)
 
