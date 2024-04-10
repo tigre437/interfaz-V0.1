@@ -19,8 +19,8 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>1331</width>
-      <height>800</height>
+      <width>1174</width>
+      <height>888</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -2104,7 +2104,7 @@
         <number>9</number>
        </property>
        <item>
-        <widget class="QComboBox" name="comboBox_3">
+        <widget class="QComboBox" name="comboBoxFiltroAn">
          <property name="currentText">
           <string/>
          </property>
@@ -2114,7 +2114,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QListView" name="listView">
+        <widget class="QListView" name="listExperimentos">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -2124,7 +2124,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_10"/>
+        <widget class="QLineEdit" name="lblExperimentoSeleccionado"/>
        </item>
        <item>
         <widget class="QFrame" name="frame_38">
@@ -2142,21 +2142,21 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QPushButton" name="pushButton_13">
+           <widget class="QPushButton" name="buttonEmpezar">
             <property name="text">
              <string>EMPEZAR</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_11">
+           <widget class="QPushButton" name="buttonCargar">
             <property name="text">
              <string>CARGAR</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_12">
+           <widget class="QPushButton" name="buttonGuardar">
             <property name="text">
              <string>GUARDAR</string>
             </property>
@@ -2219,7 +2219,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_20"/>
+               <widget class="QLineEdit" name="txtNombreAn"/>
               </item>
              </layout>
             </widget>
@@ -2253,7 +2253,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_26"/>
+               <widget class="QLineEdit" name="txtTempAlmacenamiento"/>
               </item>
              </layout>
             </widget>
@@ -2287,7 +2287,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_27"/>
+               <widget class="QLineEdit" name="txtIdMuestreador_2"/>
               </item>
              </layout>
             </widget>
@@ -2321,7 +2321,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_28"/>
+               <widget class="QLineEdit" name="txtPosicioFiltro"/>
               </item>
              </layout>
             </widget>
@@ -2355,7 +2355,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_29"/>
+               <widget class="QLineEdit" name="txtVolAire"/>
               </item>
               <item>
                <widget class="QLabel" name="label_49">
@@ -2414,7 +2414,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QDateTimeEdit" name="dateTimeEdit_3"/>
+               <widget class="QDateTimeEdit" name="txtHoraInicio_2"/>
               </item>
              </layout>
             </widget>
@@ -2454,7 +2454,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QDateTimeEdit" name="dateTimeEdit_4"/>
+               <widget class="QDateTimeEdit" name="txtHoraFin_2"/>
               </item>
              </layout>
             </widget>
@@ -2491,7 +2491,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPlainTextEdit" name="plainTextEdit_3">
+               <widget class="QPlainTextEdit" name="txtObserv">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
@@ -2963,7 +2963,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_16">
           <item>
-           <widget class="QLabel" name="label_65">
+           <widget class="QLabel" name="MostrarPlacaA">
             <property name="minimumSize">
              <size>
               <width>312</width>
@@ -3016,7 +3016,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_71">
+              <widget class="QLabel" name="lblImagenA">
                <property name="text">
                 <string>20240321_prueba_111101011</string>
                </property>
@@ -3036,12 +3036,9 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit_38">
-               <property name="maximumSize">
-                <size>
-                 <width>45</width>
-                 <height>16777215</height>
-                </size>
+              <widget class="QLabel" name="lblTempA">
+               <property name="text">
+                <string>3º</string>
                </property>
               </widget>
              </item>
@@ -3070,7 +3067,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_17">
           <item>
-           <widget class="QLabel" name="label_68">
+           <widget class="QLabel" name="MostrarPlacaB">
             <property name="minimumSize">
              <size>
               <width>312</width>
@@ -3117,7 +3114,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit_39"/>
+              <widget class="QLabel" name="lblImagenB">
+               <property name="text">
+                <string>20240321_prueba_111101011</string>
+               </property>
+              </widget>
              </item>
              <item>
               <widget class="QLabel" name="label_70">
@@ -3127,12 +3128,69 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit_40"/>
+              <widget class="QLabel" name="lblTempB">
+               <property name="text">
+                <string>3º</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
           </item>
          </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QFrame" name="frame_59">
+      <property name="geometry">
+       <rect>
+        <x>760</x>
+        <y>10</y>
+        <width>401</width>
+        <height>744</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>366</width>
+        <height>744</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>488</width>
+        <height>745</height>
+       </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_21">
+       <property name="spacing">
+        <number>20</number>
+       </property>
+       <item>
+        <widget class="QGraphicsView" name="grafica1">
+         <property name="minimumSize">
+          <size>
+           <width>345</width>
+           <height>222</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGraphicsView" name="grafica2">
+         <property name="minimumSize">
+          <size>
+           <width>345</width>
+           <height>222</height>
+          </size>
+         </property>
         </widget>
        </item>
       </layout>
