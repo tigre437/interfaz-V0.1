@@ -7,7 +7,7 @@ import pyqtgraph as pg
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtWidgets import (
     QFileDialog, QDialog, QLabel, QLineEdit,
-    QPushButton, QVBoxLayout, QMessageBox, QGraphicsProxyWidget
+    QPushButton, QVBoxLayout, QMessageBox, QGraphicsProxyWidget, QListWidgetItem
 )
 from PyQt6.QtCore import pyqtSlot, Qt, pyqtSignal, QThread
 from PyQt6.QtGui import QPixmap, QTransform
@@ -16,6 +16,7 @@ from pygrabber.dshow_graph import FilterGraph
 import datetime
 from configFotos import Ui_Dialog
 import threading
+from PIL import Image   
 
 
 ruta_experimento_activo = None
@@ -61,7 +62,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.comboBoxCamara.currentIndexChanged.connect(self.update_camera_index)
         self.checkBoxHabilitarA.stateChanged.connect(self.cambiarPlacaA)
         self.checkBoxHabilitarB.stateChanged.connect(self.cambiarPlacaB)
-        self.comboBoxFiltro.currentIndexChanged.connect(self.comprobar_opcion_seleccionada)
+        self.comboBoxFiltro.currentIndexChanged.connect(lambda index: self.comprobar_opcion_seleccionada(index, self.comboBoxFiltro))
         self.buttonGuardarFiltro.clicked.connect(self.guardar_datos_filtro)
         self.buttonCancelarFiltro.clicked.connect(self.cancelar_cambios_filtro)
         self.buttonIniciar.clicked.connect(self.iniciar_experimento)
@@ -79,8 +80,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.buttonConfiguracionExper.clicked.connect(self.open_dialog)
 
-        #self.buttonIniciar.clicked.connect(self.iniciar_expermiento)
-        
+        self.buttonRecargar.clicked.connect(lambda index: self.filechooser("hola"))
+
+        self.buttonCargar.clicked.connect(self.cargar_datos_experimento)
+        self.buttonGuardar.clicked.connect(self.guardar_datos_experimento)
+
         # Dimensiones para mostrar la imagen
         self.display_width = self.width() // 2
         self.display_height = self.height() // 2
@@ -109,6 +113,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.buttonParar.clicked.connect(self.pararExperimento)
 
+        self.listExperimentos.itemDoubleClicked.connect(self.mostrar_nombre_experimento)
+
         #Aqui hay que setear de primeras las temperaturas de los liquidos
         #self.pintar_grafica(temp_bloc, temp_liquid, temp_set)
 
@@ -121,6 +127,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # CADA TIMER SE AÑADE UN VALOR A LAS LISTAS DE DATO
 
+
+        ######################  ANALISIS  ##########################
+
+        self.comboBoxFiltroAn.addItem("Crear un filtro nuevo ...")
+        self.comboBoxFiltroAn.currentIndexChanged.connect(lambda index: self.comprobar_opcion_seleccionada(index, self.comboBoxFiltroAn))
+
+
+
+ 
 
     def detener_timer(self):
         self.timer.stop()
@@ -217,48 +232,64 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         carpetas_sns = [carpeta for carpeta in carpetas if carpeta.startswith("SNS")]
         return carpetas_sns
 
-    def filechooser(self):
+    def filechooser(self, folder = None):
         """Abre un diálogo para seleccionar una carpeta."""
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.FileMode.Directory)
-        
-        if file_dialog.exec():
-            selected_folder = file_dialog.selectedFiles()
-            carpeta_seleccionada = selected_folder[0]
-            self.txtArchivos.setText(carpeta_seleccionada)
-            carpetas_sns = self.buscar_carpetas_sns(carpeta_seleccionada)
-            
-            if carpetas_sns:
+        if not folder:
+            file_dialog = QFileDialog()
+            file_dialog.setFileMode(QFileDialog.FileMode.Directory)
+            if file_dialog.exec():
+                print(folder)
+                selected_folder = file_dialog.selectedFiles()
+                carpeta_seleccionada = selected_folder[0]
+        else:
+            carpeta_seleccionada = self.txtArchivos.text()
 
+        self.txtArchivos.setText(carpeta_seleccionada)
+        carpetas_sns = self.buscar_carpetas_sns(carpeta_seleccionada)
+        
+        if carpetas_sns:
+            if self.tabWidget.tabText(self.tabWidget.currentIndex()) == "Experimento":
                 if self.comboBoxFiltro.count() > 1:
                     self.comboBoxFiltro.clear()
                     self.comboBoxFiltro.addItem("Crear un filtro nuevo ...")
                 for carpeta in carpetas_sns:
                     self.comboBoxFiltro.addItem(carpeta)
             else:
-                print("No se encontraron carpetas que empiecen por 'SNS' dentro de la carpeta seleccionada.")
+                if self.comboBoxFiltroAn.count() > 1:
+                    self.comboBoxFiltroAn.clear()
+                    self.comboBoxFiltroAn.addItem("Crear un filtro nuevo ...")
+                for carpeta in carpetas_sns:
+                    self.comboBoxFiltroAn.addItem(carpeta)
+        else:
+            print("No se encontraron carpetas que empiecen por 'SNS' dentro de la carpeta seleccionada.")
 
-    def comprobar_opcion_seleccionada(self, index):
+    def comprobar_opcion_seleccionada(self, index, combobox):
         """Comprueba la opción seleccionada en el combobox de filtros."""
         if index == 0:  
-            if(self.txtArchivos.text() == None or self.txtArchivos.text() == ""):
+            if(combobox.currentText() == None or combobox.currentText() == ""):
                 QMessageBox.warning(self, "Alerta", "Seleccione una carpeta para guardar los filtros antes de continuar.")
                 self.filechooser()
             nombre_carpeta = self.obtener_nombre_carpeta()
             if nombre_carpeta:
                 self.crear_carpeta(nombre_carpeta)
         else:
-            datos_filtro = self.leer_json_filtro(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "filter.json")
-            if (datos_filtro != None):
-                self.rellenar_datos_filtro(datos_filtro)
+            if combobox == self.comboBoxFiltro:  # Solo rellenar datos si el combobox es comboBoxFiltro
+                datos_filtro = self.leer_json_filtro(self.txtArchivos.text() + "/" + combobox.currentText() + "/" + "filter.json")
+                if (datos_filtro != None):
+                    self.rellenar_datos_filtro(datos_filtro)
 
-            datos_detection = self.leer_json_detection(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "detection.json")
-            if (datos_detection != None):
-                self.rellenar_datos_detection(datos_detection)
+                datos_detection = self.leer_json_detection(self.txtArchivos.text() + "/" + combobox.currentText() + "/" + "detection.json")
+                if (datos_detection != None):
+                    self.rellenar_datos_detection(datos_detection)
 
-            datos_temp = self.leer_json_temp(self.txtArchivos.text() + "/" + self.comboBoxFiltro.currentText() + "/" + "temp.json")
-            if (datos_temp != None):
-                self.rellenar_datos_temp(datos_temp)
+                datos_temp = self.leer_json_temp(self.txtArchivos.text() + "/" + combobox.currentText() + "/" + "temp.json")
+                if (datos_temp != None):
+                    self.rellenar_datos_temp(datos_temp)
+            else:
+                carpetas = self.cargar_lista_experimentos(self.txtArchivos.text() + "/" + combobox.currentText())
+                print(carpetas)
+
+
     
 
     def cancelar_cambios_filtro(self):
@@ -379,19 +410,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def rellenar_datos_filtro(self, datos):
         """Asigna los valores correspondientes a cada campo de texto."""
-        self.txtNombreFiltro.setText(datos['label'])
-        self.txtTempStorage.setText(str(datos['storage_temperature']))
-        self.txtIdMuestreador.setText(datos['sampler_id'])
-        self.txtPosFilter.setText(str(datos['filter_position']))
-        self.txtAirVol.setText(str(datos['air_volume']))
-        self.txtHoraInicio.setDateTime(QtCore.QDateTime.fromString(datos['start_time'], "yyyy-MM-dd hh:mm"))
-        self.txtHoraFin.setDateTime(QtCore.QDateTime.fromString(datos['end_time'], "yyyy-MM-dd hh:mm"))
-        
-        # Observaciones puede ser nulo, así que verificamos antes de asignar
-        if datos['observations'] is not None:
-            self.txaObservFiltro.setPlainText(datos['observations'])
-        else:
-            self.txaObservFiltro.clear()  # Limpiamos el campo si las observaciones son nulas
+
+        if self.tabWidget.tabText(self.tabWidget.currentIndex()) == "Experimento":
+
+            self.txtNombreFiltro.setText(datos['label'])
+            self.txtTempStorage.setText(str(datos['storage_temperature']))
+            self.txtIdMuestreador.setText(datos['sampler_id'])
+            self.txtPosFilter.setText(str(datos['filter_position']))
+            self.txtAirVol.setText(str(datos['air_volume']))
+            self.txtHoraInicio.setDateTime(QtCore.QDateTime.fromString(datos['start_time'], "yyyy-MM-dd hh:mm"))
+            self.txtHoraFin.setDateTime(QtCore.QDateTime.fromString(datos['end_time'], "yyyy-MM-dd hh:mm"))
+            
+            # Observaciones puede ser nulo, así que verificamos antes de asignar
+            if datos['observations'] is not None:
+                self.txaObservFiltro.setPlainText(datos['observations'])
+            else:
+                self.txaObservFiltro.clear()  # Limpiamos el campo si las observaciones son nulas
 
     def crear_json_filtro(self, ruta_carpeta_sns):
         """Crea el archivo filter.json."""
@@ -936,7 +970,191 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         p = convert_to_Qt_format.scaled(self.display_width, self.display_height, Qt.AspectRatioMode.KeepAspectRatio)
         return QPixmap.fromImage(p)
 
+
+
+######################## ANALISIS #################################
+
+    def leer_json_experimento(self):
+        """Lee un archivo JSON de temperatura y devuelve los datos relevantes."""
+
+        archivo_json = self.txtArchivos.text() + "/" + self.comboBoxFiltroAn.currentText() + "/" + self.lblExperimentoSeleccionado.text() + "/" + "experimento.json"
+        try:
+            with open(archivo_json, 'r') as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            QMessageBox.warning(self, "Advertencia", f"El archivo '{archivo_json}' no existe.", QMessageBox.StandardButton.Ok)
+            return
+        except json.JSONDecodeError:
+            QMessageBox.warning(self, "Advertencia", f"El archivo '{archivo_json}' no es un archivo JSON válido.", QMessageBox.StandardButton.Ok)
+            return
+
+        label = data.get('label', '')
+        storage_temperature = data.get('storage_temperature', 0.00)
+        sampler_id = data.get('sampler_id', '')
+        filter_position = data.get('filter_position', 0)
+        air_volumen = data.get('air_volumen', 0.00)
+        start_time = data.get('start_time', '')
+        end_time = data.get('end_time', '')
+        observations = data.get('observations', '')
+        threshold = data.get('threshold', 0.00)
+        min_radius = data.get('min_radius', 0.00)
+        max_radius = data.get('max_radius', 0.00)
+        polygon = data.get('polygon', 0.00)
+        v_drop = data.get('v_drop', 0.00)
+        v_wash = data.get('v_wash', 0.00)
+        dil_factor = data.get('dil_factor', 0.00)
+        filter_fraction = data.get('filter_fraction', 0.00)
+        sampling_rate = data.get('sampling_rate', 0.00)
+        cooling_rate = data.get('cooling_rate', 0.00)
+        observations_exp = data.get('observations_exp', '')
+
+        return {
+            'label': label,
+            'storage_temperature': storage_temperature,
+            'sampler_id': sampler_id,
+            'filter_position': filter_position,
+            'air_volumen': air_volumen,
+            'start_time': start_time,
+            'end_time': end_time,
+            'observations': observations,
+            'threshold': threshold,
+            'min_radius': min_radius,
+            'max_radius': max_radius,
+            'polygon': polygon,
+            'v_drop': v_drop,
+            'v_wash': v_wash,
+            'dil_factor': dil_factor,
+            'filter_fraction': filter_fraction,
+            'sampling_rate': sampling_rate,
+            'cooling_rate': cooling_rate,
+            'observations_exp': observations_exp
+        }
     
+    def cargar_datos_experimento(self):
+        datos = self.leer_json_experimento()
+        """Asigna los valores correspondientes a cada campo de texto."""
+        self.txtNombreExperimento.setText(self.lblExperimentoSeleccionado.text())
+        self.txtNombreFiltroAn.setText(datos['label'])
+        self.txtTempAlmacenamiento.setText(str(datos['storage_temperature']))
+        self.txtIdMuestreador_2.setText(datos['sampler_id'])
+        self.txtPosicionFiltro.setText(str(datos['filter_position']))
+        self.txtVolAire.setText(str(datos['air_volumen']))
+        self.txtHoraInicio_2.setDateTime(QtCore.QDateTime.fromString(datos['start_time'], "yyyy-MM-dd hh:mm"))
+        self.txtHoraFin_2.setDateTime(QtCore.QDateTime.fromString(datos['end_time'], "yyyy-MM-dd hh:mm"))
+
+        # Observaciones puede ser nulo, así que verificamos antes de asignar
+        if datos['observations'] is not None:
+            self.txtObserv.setPlainText(datos['observations'])
+        else:
+            self.txtObserv.clear()  # Limpiamos el campo si las observaciones son nulas
+
+        self.txtVDrop.setText(str(datos.get('v_drop', '')))
+        self.txtVWash.setText(str(datos.get('v_wash', '')))
+        self.txtFactorDiluc.setText(str(datos.get('dil_factor', '')))
+        self.txtFraccionFiltro.setText(str(datos.get('filter_fraction', '')))
+        self.txtTasaMuestreo.setText(str(datos.get('sampling_rate', '')))
+        self.txtVelEnfriamiento.setText(str(datos.get('cooling_rate', '')))
+        self.txtObservExpe.setPlainText(str(datos.get('observations_exp', '')))
+
+    def cargar_lista_experimentos(self, ruta):
+        self.listExperimentos.clear()
+        carpetas_con_experiment_json = []
+
+        # Verificar que la ruta exista y sea un directorio
+        if os.path.exists(ruta) and os.path.isdir(ruta):
+            # Recorrer cada elemento dentro de la ruta
+            for elemento in os.listdir(ruta):
+                # Verificar si el elemento es un directorio
+                if os.path.isdir(os.path.join(ruta, elemento)):
+                    # Verificar si dentro del directorio hay un archivo llamado "experiment.json"
+                    if 'experimento.json' in os.listdir(os.path.join(ruta, elemento)):
+                        carpetas_con_experiment_json.append(elemento)
+
+        for carpeta in carpetas_con_experiment_json:
+            item = QListWidgetItem(carpeta)  # Corrección aquí
+            self.listExperimentos.addItem(item)
+
+        return carpetas_con_experiment_json
+    
+    def mostrar_nombre_experimento(self, item):
+        self.lblExperimentoSeleccionado.setText(item.text())
+
+
+    def guardar_datos_experimento(self):
+        """Guarda los datos del experimento en un archivo JSON."""
+        # Obtener los datos de los campos del experimento
+        nombre_experimento = self.lblExperimentoSeleccionado.text()
+        nombre_filtro = self.txtNombreFiltroAn.text()
+        temp_almacenamiento = float(self.txtTempAlmacenamiento.text())
+        id_muestreador = self.txtIdMuestreador_2.text()
+        posicion_filtro = int(self.txtPosicionFiltro.text())
+        vol_aire = float(self.txtVolAire.text())
+        hora_inicio = self.txtHoraInicio_2.dateTime().toString("yyyy-MM-dd hh:mm")
+        hora_fin = self.txtHoraFin_2.dateTime().toString("yyyy-MM-dd hh:mm")
+        observaciones = self.txtObserv.toPlainText()
+        v_drop = float(self.txtVDrop.text())
+        v_wash = float(self.txtVWash.text())
+        factor_diluc = float(self.txtFactorDiluc.text())
+        fraccion_filtro = float(self.txtFraccionFiltro.text())
+        tasa_muestreo = float(self.txtTasaMuestreo.text())
+        vel_enfriamiento = float(self.txtVelEnfriamiento.text())
+        observaciones_exp = self.txtObservExpe.toPlainText()
+
+        # Crear un diccionario con los datos del experimento
+        datos_experimento = {
+            'label': nombre_filtro,
+            'storage_temperature': temp_almacenamiento,
+            'sampler_id': id_muestreador,
+            'filter_position': posicion_filtro,
+            'air_volumen': vol_aire,
+            'start_time': hora_inicio,
+            'end_time': hora_fin,
+            'observations': observaciones,
+            'v_drop': v_drop,
+            'v_wash': v_wash,
+            'dil_factor': factor_diluc,
+            'filter_fraction': fraccion_filtro,
+            'sampling_rate': tasa_muestreo,
+            'cooling_rate': vel_enfriamiento,
+            'observations_exp': observaciones_exp
+        }
+
+        archivo_json = self.txtArchivos.text() + "/" + self.comboBoxFiltroAn.currentText() + "/" + self.lblExperimentoSeleccionado.text() + "/" + "experimento.json"
+
+        # Guardar los datos del experimento en el archivo JSON
+        with open(archivo_json, 'w') as file:
+            json.dump(datos_experimento, file)
+
+        QMessageBox.information(self, "Guardado", "Los datos del experimento se han actualizado correctamente.", QMessageBox.StandardButton.Ok)
+
+
+
+    def cargar_imagenes(self):
+            
+        # Ruta de la carpeta que contiene las imágenes
+        carpeta_imagenes = "ruta/a/la/carpeta"
+
+        # Lista para almacenar las imágenes ordenadas
+        imagenes_ordenadas = []
+
+        # Obtener la lista de nombres de archivos en la carpeta
+        archivos_en_carpeta = os.listdir(carpeta_imagenes)
+
+        # Filtrar solo los archivos de imagen (suponiendo que solo quieres imágenes)
+        imagenes = [archivo for archivo in archivos_en_carpeta if archivo.endswith(('.jpg', '.jpeg', '.png', '.gif'))]
+
+        # Ordenar las imágenes por nombre de archivo
+        imagenes.sort()
+
+        # Leer cada imagen y agregarla a la lista
+        for imagen_nombre in imagenes:
+            ruta_imagen = os.path.join(carpeta_imagenes, imagen_nombre)
+            imagen = Image.open(ruta_imagen)
+            imagenes_ordenadas.append(imagen)
+
+        # Ahora tienes la lista `imagenes_ordenadas` que contiene las imágenes ordenadas
+
+            
 
 ####################### CLASE CAMARA ##############################
 

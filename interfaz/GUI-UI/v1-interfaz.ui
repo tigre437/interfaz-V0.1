@@ -19,7 +19,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>1174</width>
+      <width>1321</width>
       <height>888</height>
      </rect>
     </property>
@@ -2114,17 +2114,17 @@
         </widget>
        </item>
        <item>
-        <widget class="QListView" name="listExperimentos">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>119</height>
-          </size>
-         </property>
-        </widget>
+        <widget class="QListWidget" name="listExperimentos"/>
        </item>
        <item>
-        <widget class="QLineEdit" name="lblExperimentoSeleccionado"/>
+        <widget class="QLineEdit" name="lblExperimentoSeleccionado">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QFrame" name="frame_38">
@@ -2219,7 +2219,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="txtNombreAn"/>
+               <widget class="QLineEdit" name="txtNombreFiltroAn"/>
               </item>
              </layout>
             </widget>
@@ -2321,7 +2321,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="txtPosicioFiltro"/>
+               <widget class="QLineEdit" name="txtPosicionFiltro"/>
               </item>
              </layout>
             </widget>
@@ -2545,7 +2545,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_30"/>
+               <widget class="QLineEdit" name="txtNombreExperimento"/>
               </item>
              </layout>
             </widget>
@@ -2585,7 +2585,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_31"/>
+               <widget class="QLineEdit" name="txtVDrop"/>
               </item>
               <item>
                <widget class="QLabel" name="label_55">
@@ -2644,7 +2644,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_32"/>
+               <widget class="QLineEdit" name="txtVWash"/>
               </item>
               <item>
                <widget class="QLabel" name="label_57">
@@ -2703,7 +2703,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_33"/>
+               <widget class="QLineEdit" name="txtFactorDiluc"/>
               </item>
              </layout>
             </widget>
@@ -2743,7 +2743,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_34"/>
+               <widget class="QLineEdit" name="txtFraccionFiltro"/>
               </item>
              </layout>
             </widget>
@@ -2783,7 +2783,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_35"/>
+               <widget class="QLineEdit" name="txtTasaMuestreo"/>
               </item>
               <item>
                <widget class="QLabel" name="label_61">
@@ -2842,7 +2842,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_36"/>
+               <widget class="QLineEdit" name="txtVelEnfriamiento"/>
               </item>
               <item>
                <widget class="QLabel" name="label_63">
@@ -2898,7 +2898,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPlainTextEdit" name="plainTextEdit_4">
+               <widget class="QPlainTextEdit" name="txtObservExpe">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
@@ -2921,13 +2921,13 @@
        <rect>
         <x>400</x>
         <y>10</y>
-        <width>366</width>
+        <width>407</width>
         <height>744</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
-        <width>366</width>
+        <width>407</width>
         <height>744</height>
        </size>
       </property>
@@ -2948,7 +2948,7 @@
         <widget class="QGroupBox" name="groupBox_3">
          <property name="minimumSize">
           <size>
-           <width>348</width>
+           <width>396</width>
            <height>303</height>
           </size>
          </property>
@@ -2966,14 +2966,14 @@
            <widget class="QLabel" name="MostrarPlacaA">
             <property name="minimumSize">
              <size>
-              <width>312</width>
+              <width>373</width>
               <height>234</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
               <width>312</width>
-              <height>234</height>
+              <height>720</height>
              </size>
             </property>
             <property name="styleSheet">
@@ -3052,7 +3052,7 @@
         <widget class="QGroupBox" name="groupBox_4">
          <property name="minimumSize">
           <size>
-           <width>312</width>
+           <width>396</width>
            <height>302</height>
           </size>
          </property>
@@ -3070,14 +3070,14 @@
            <widget class="QLabel" name="MostrarPlacaB">
             <property name="minimumSize">
              <size>
-              <width>312</width>
+              <width>373</width>
               <height>234</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
               <width>312</width>
-              <height>234</height>
+              <height>720</height>
              </size>
             </property>
             <property name="styleSheet">
@@ -3145,9 +3145,9 @@
      <widget class="QFrame" name="frame_59">
       <property name="geometry">
        <rect>
-        <x>760</x>
+        <x>820</x>
         <y>10</y>
-        <width>401</width>
+        <width>488</width>
         <height>744</height>
        </rect>
       </property>
@@ -3202,7 +3202,7 @@
      <rect>
       <x>159</x>
       <y>0</y>
-      <width>1081</width>
+      <width>1151</width>
       <height>44</height>
      </rect>
     </property>
@@ -3224,6 +3224,13 @@
        <property name="icon">
         <iconset theme="document-open">
          <normaloff>.</normaloff>.</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="buttonRecargar">
+       <property name="text">
+        <string>Recargar</string>
        </property>
       </widget>
      </item>
