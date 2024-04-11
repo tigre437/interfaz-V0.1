@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -91,7 +91,7 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <property name="usesScrollButtons">
              <bool>true</bool>
@@ -2920,9 +2920,9 @@
       <property name="geometry">
        <rect>
         <x>400</x>
-        <y>10</y>
+        <y>-16</y>
         <width>521</width>
-        <height>744</height>
+        <height>771</height>
        </rect>
       </property>
       <property name="minimumSize">
@@ -2934,7 +2934,7 @@
       <property name="maximumSize">
        <size>
         <width>550</width>
-        <height>745</height>
+        <height>779</height>
        </size>
       </property>
       <property name="frameShape">
@@ -2959,9 +2959,12 @@
           </size>
          </property>
          <property name="title">
-          <string>Placa A</string>
+          <string>Imagenes</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_16">
+          <property name="spacing">
+           <number>0</number>
+          </property>
           <item>
            <widget class="QLabel" name="MostrarPlacaA">
             <property name="minimumSize">
@@ -2973,7 +2976,7 @@
             <property name="maximumSize">
              <size>
               <width>312</width>
-              <height>720</height>
+              <height>640</height>
              </size>
             </property>
             <property name="layoutDirection">
@@ -3013,10 +3016,16 @@
              </property>
              <item>
               <widget class="QLabel" name="label_66">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>17</height>
+                </size>
+               </property>
                <property name="maximumSize">
                 <size>
                  <width>47</width>
-                 <height>16777215</height>
+                 <height>21</height>
                 </size>
                </property>
                <property name="text">
@@ -3026,6 +3035,12 @@
              </item>
              <item>
               <widget class="QLabel" name="lblImagenA">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>17</height>
+                </size>
+               </property>
                <property name="text">
                 <string>20240321_prueba_111101011</string>
                </property>
@@ -3033,6 +3048,12 @@
              </item>
              <item>
               <widget class="QLabel" name="label_67">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>17</height>
+                </size>
+               </property>
                <property name="maximumSize">
                 <size>
                  <width>39</width>
@@ -3046,12 +3067,43 @@
              </item>
              <item>
               <widget class="QLabel" name="lblTempA">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>17</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>40</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="text">
                 <string>3º</string>
                </property>
               </widget>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="sliderFotos">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>18</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>18</height>
+             </size>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
            </widget>
           </item>
          </layout>

@@ -20,6 +20,7 @@ import threading
 
 ruta_experimento_activo = None
 parar = False
+lista_imagenes_analisis = []
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
     def __init__(self, *args, obj=None, **kwargs):
@@ -108,11 +109,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.dSpinBoxTempMax.valueChanged.connect(self.hSliderTempMax.setValue)
         self.dSpinBoxTempSet.valueChanged.connect(self.hSliderTempSet.setValue)
 
-        self.buttonConectarTermo.clicked.connect(self.cargar_imagenes)
+        #self.buttonConectarTermo.clicked.connect(self.cargar_imagenes)
 
         self.buttonParar.clicked.connect(self.pararExperimento)
 
         self.listExperimentos.itemDoubleClicked.connect(self.mostrar_nombre_experimento)
+        self.sliderFotos.valueChanged.connect(self.actualizar_imagen)
 
         #Aqui hay que setear de primeras las temperaturas de los liquidos
         #self.pintar_grafica(temp_bloc, temp_liquid, temp_set)
@@ -124,7 +126,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         #self.timer.timeout.connect(self.actualizar_grafica)
         #self.timer.start(1000)
 
-        # CADA TIMER SE AÑADE UN VALOR A LAS LISTAS DE DATO
+        #SE AÑADE UN VALOR A LAS LISTAS DE DATO
 
 
         ######################  ANALISIS  ##########################
@@ -930,7 +932,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if (self.dSpinBoxTempSet.value() == datos_camara['temp_set']):
                 print("if")
                 time.sleep(int(datos_camara['frecuencia']))
-                self.thread.save(ruta_imagenes, self.tabWidget_2.tabText(self.tabWidget_2.currentIndex()))
+                self.thread.save(ruta_imagenes, self.tabWidget_2.tabText(self.tabWidget_2.currentIndex()), self.checkBoxAmbasPlacas.isChecked())
             else:
                 print("else")
                 time.sleep(int(datos_camara['frecuencia']))
@@ -1056,6 +1058,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.txtVelEnfriamiento.setText(str(datos.get('cooling_rate', '')))
         self.txtObservExpe.setPlainText(str(datos.get('observations_exp', '')))
 
+        self.cargar_imagenes()
+
     def cargar_lista_experimentos(self, ruta):
         self.listExperimentos.clear()
         carpetas_con_experiment_json = []
@@ -1135,7 +1139,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         carpeta_imagenes = self.txtArchivos.text() + "/" + self.comboBoxFiltroAn.currentText() + "/" + self.lblExperimentoSeleccionado.text() + "/imagenes"
 
         # Lista para almacenar las imágenes ordenadas como QPixmap
-        imagenes_ordenadas = []
+        global lista_imagenes_analisis
+        lista_imagenes_analisis = []
 
         # Obtener la lista de nombres de archivos en la carpeta
         archivos_en_carpeta = os.listdir(carpeta_imagenes)
@@ -1148,16 +1153,36 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Cargar cada imagen como QPixmap y agregarla a la lista
         for imagen_nombre in imagenes:
+            # Crea la ruta de la imagen
             ruta_imagen = os.path.join(carpeta_imagenes, imagen_nombre)
+            
+            # Carga la imagen como QPixmap
             pixmap = QPixmap(ruta_imagen)
-            #pixmap = pixmap.transformed(QTransform().rotate(90))
-            imagenes_ordenadas.append(pixmap)
+            
+            # Aplica cualquier transformación necesaria
+            pixmap = pixmap.transformed(QTransform().rotate(90))
+            
+            # Crea una instancia de la clase Imagen y agrega a la lista
+            imagen = Imagen(imagen_nombre, pixmap, 0)  # Asegúrate de definir `temp` donde sea necesario
+            lista_imagenes_analisis.append(imagen)
+
+        print(len(lista_imagenes_analisis) - 1)
+
+        self.sliderFotos.setMaximum(len(lista_imagenes_analisis) - 1) 
         
-        self.MostrarPlacaA.setPixmap(imagenes_ordenadas[0])
+        self.MostrarPlacaA.setPixmap(lista_imagenes_analisis[0].get_pixmap())
+        self.lblImagenA.setText(lista_imagenes_analisis[0].get_nombre())
+        self.lblTempA.setText(lista_imagenes_analisis[0].get_temp())
         print("Dimensiones de la imagen:", pixmap.size().width(), "x", pixmap.size().height())
         print("Dimensiones del QLabel:", self.MostrarPlacaA.width(), "x", self.MostrarPlacaA.height())
-
-            
+    
+    def actualizar_imagen(self):
+        # Obtener el índice seleccionado por el slider
+        indice_imagen = self.sliderFotos.value()
+        # Cargar la imagen y mostrarla en el QLabel
+        self.MostrarPlacaA.setPixmap(lista_imagenes_analisis[indice_imagen].get_pixmap())
+        self.lblImagenA.setText(lista_imagenes_analisis[indice_imagen].get_nombre())
+        self.lblTempA.setText(str(lista_imagenes_analisis[indice_imagen].get_temp()))
 
 ####################### CLASE CAMARA ##############################
 
@@ -1193,7 +1218,7 @@ class VideoThread(QThread):
     def settings(self):
         self.cap.set(cv2.CAP_PROP_SETTINGS, 1)
 
-    def save(self, ruta_experimento, area):
+    def save(self, ruta_experimento, area, doble):
         # Obtener la fecha y hora actual
         now = datetime.datetime.now()
 
@@ -1202,22 +1227,47 @@ class VideoThread(QThread):
 
         ret, cv_img = self.cap.read()
         if ret:
-            height, width, _ = cv_img.shape
-            if area == 'Placa A':
-                cv_img = cv_img[:, :width // 2]  # Recortar la mitad izquierda de la imagen
-            elif area == 'Placa B':
-                cv_img = cv_img[:, width // 2:]  # Recortar la mitad derecha de la imagen
-            
+            if not doble:
+                height, width, _ = cv_img.shape
+                if area == 'Placa A':
+                    cv_img = cv_img[:, :width // 2]  # Recortar la mitad izquierda de la imagen
+                elif area == 'Placa B':
+                    cv_img = cv_img[:, width // 2:]  # Recortar la mitad derecha de la imagen
             # Guardar la imagen en la carpeta "imagenes"
             cv2.imwrite(os.path.join(f"{ruta_experimento}/imagenes", f"{timestamp}.jpg"), cv_img)
         else:
             print("Error al capturar la imagen. No se guardará.")
 
-
     def set_camera_index(self, index):
         """Establece el índice del dispositivo de captura"""
         self.camera_index = index
 
+
+####################### OBJETO FOTO ###########################
+
+class Imagen:
+    def __init__(self, nombre, pixmap, temp):
+        self._nombre = nombre
+        self._pixmap = pixmap
+        self._temp = temp
+
+    def get_nombre(self):
+        return self._nombre
+
+    def set_nombre(self, nombre):
+        self._nombre = nombre
+
+    def get_pixmap(self):
+        return self._pixmap
+
+    def set_pixmap(self, pixmap):
+        self._pixmap = pixmap
+
+    def get_temp(self):
+        return (self._temp + "º")
+
+    def set_temp(self, temp):
+        self._temp = temp
 
 
 # Creación de la aplicación y ventana principal
