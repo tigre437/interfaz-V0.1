@@ -2921,7 +2921,7 @@
        <rect>
         <x>400</x>
         <y>10</y>
-        <width>407</width>
+        <width>521</width>
         <height>744</height>
        </rect>
       </property>
@@ -2933,7 +2933,7 @@
       </property>
       <property name="maximumSize">
        <size>
-        <width>366</width>
+        <width>550</width>
         <height>745</height>
        </size>
       </property>
@@ -2944,30 +2944,30 @@
        <enum>QFrame::Raised</enum>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_15">
-       <item alignment="Qt::AlignTop">
+       <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
         <widget class="QGroupBox" name="groupBox_3">
          <property name="minimumSize">
           <size>
            <width>396</width>
-           <height>303</height>
+           <height>733</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>312</width>
-           <height>274</height>
+           <width>500</width>
+           <height>800</height>
           </size>
          </property>
          <property name="title">
-          <string>Placa A</string>
+          <string>Imagenes</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_16">
           <item>
            <widget class="QLabel" name="MostrarPlacaA">
             <property name="minimumSize">
              <size>
-              <width>373</width>
-              <height>234</height>
+              <width>480</width>
+              <height>320</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -2976,11 +2976,20 @@
               <height>720</height>
              </size>
             </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">border: 1px solid black;</string>
             </property>
             <property name="text">
-             <string>TextLabel</string>
+             <string>IMAGENES DE LAS PLACAS</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -3048,119 +3057,27 @@
          </layout>
         </widget>
        </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_4">
-         <property name="minimumSize">
-          <size>
-           <width>396</width>
-           <height>302</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>331</width>
-           <height>274</height>
-          </size>
-         </property>
-         <property name="title">
-          <string>Placa B</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_17">
-          <item>
-           <widget class="QLabel" name="MostrarPlacaB">
-            <property name="minimumSize">
-             <size>
-              <width>373</width>
-              <height>234</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>312</width>
-              <height>720</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">border: 1px solid black;</string>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QFrame" name="frame_57">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>26</height>
-             </size>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_67">
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="label_69">
-               <property name="text">
-                <string>Imagen: </string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="lblImagenB">
-               <property name="text">
-                <string>20240321_prueba_111101011</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_70">
-               <property name="text">
-                <string>| Temp: </string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="lblTempB">
-               <property name="text">
-                <string>3º</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
       </layout>
      </widget>
      <widget class="QFrame" name="frame_59">
       <property name="geometry">
        <rect>
-        <x>820</x>
+        <x>907</x>
         <y>10</y>
-        <width>488</width>
-        <height>744</height>
+        <width>401</width>
+        <height>752</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
         <width>366</width>
-        <height>744</height>
+        <height>752</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>488</width>
-        <height>745</height>
+        <height>752</height>
        </size>
       </property>
       <property name="frameShape">

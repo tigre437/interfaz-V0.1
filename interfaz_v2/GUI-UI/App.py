@@ -15,8 +15,7 @@ from interfazv1 import Ui_MainWindow  # Importa la interfaz de la ventana princi
 from pygrabber.dshow_graph import FilterGraph
 import datetime
 from configFotos import Ui_Dialog
-import threading
-from PIL import Image   
+import threading  
 
 
 ruta_experimento_activo = None
@@ -109,7 +108,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.dSpinBoxTempMax.valueChanged.connect(self.hSliderTempMax.setValue)
         self.dSpinBoxTempSet.valueChanged.connect(self.hSliderTempSet.setValue)
 
-        self.buttonConectarTermo.clicked.connect(self.save)
+        self.buttonConectarTermo.clicked.connect(self.cargar_imagenes)
 
         self.buttonParar.clicked.connect(self.pararExperimento)
 
@@ -838,6 +837,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.buttonParar.setEnabled(True)
         global parar
         parar = False
+        self.save()
 
     def pararExperimento(self):
         global parar
@@ -1132,9 +1132,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def cargar_imagenes(self):
             
         # Ruta de la carpeta que contiene las imágenes
-        carpeta_imagenes = "ruta/a/la/carpeta"
+        carpeta_imagenes = self.txtArchivos.text() + "/" + self.comboBoxFiltroAn.currentText() + "/" + self.lblExperimentoSeleccionado.text() + "/imagenes"
 
-        # Lista para almacenar las imágenes ordenadas
+        # Lista para almacenar las imágenes ordenadas como QPixmap
         imagenes_ordenadas = []
 
         # Obtener la lista de nombres de archivos en la carpeta
@@ -1146,13 +1146,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # Ordenar las imágenes por nombre de archivo
         imagenes.sort()
 
-        # Leer cada imagen y agregarla a la lista
+        # Cargar cada imagen como QPixmap y agregarla a la lista
         for imagen_nombre in imagenes:
             ruta_imagen = os.path.join(carpeta_imagenes, imagen_nombre)
-            imagen = Image.open(ruta_imagen)
-            imagenes_ordenadas.append(imagen)
-
-        # Ahora tienes la lista `imagenes_ordenadas` que contiene las imágenes ordenadas
+            pixmap = QPixmap(ruta_imagen)
+            #pixmap = pixmap.transformed(QTransform().rotate(90))
+            imagenes_ordenadas.append(pixmap)
+        
+        self.MostrarPlacaA.setPixmap(imagenes_ordenadas[0])
+        print("Dimensiones de la imagen:", pixmap.size().width(), "x", pixmap.size().height())
+        print("Dimensiones del QLabel:", self.MostrarPlacaA.width(), "x", self.MostrarPlacaA.height())
 
             
 
