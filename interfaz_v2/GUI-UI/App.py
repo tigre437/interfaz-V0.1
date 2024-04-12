@@ -7,9 +7,9 @@ import pyqtgraph as pg
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtWidgets import (
     QFileDialog, QDialog, QLabel, QLineEdit,
-    QPushButton, QVBoxLayout, QMessageBox, QGraphicsProxyWidget, QListWidgetItem
+    QPushButton, QVBoxLayout, QMessageBox, QGraphicsProxyWidget, QListWidgetItem, QDialog
 )
-from PyQt6.QtCore import pyqtSlot, Qt, pyqtSignal, QThread
+from PyQt6.QtCore import pyqtSlot, Qt, pyqtSignal, QThread, QTimer
 from PyQt6.QtGui import QPixmap, QTransform
 from interfazv1 import Ui_MainWindow  # Importa la interfaz de la ventana principal
 from pygrabber.dshow_graph import FilterGraph
@@ -70,6 +70,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tabWidget_2.currentChanged.connect(self.tab_changed)
         self.checkBoxHabilitarA.stateChanged.connect(self.tab_changed)
         self.checkBoxHabilitarB.stateChanged.connect(self.tab_changed)
+        self.checkBoxAmbasPlacas.stateChanged.connect(self.tab_changed)
         self.checkBoxAmbasPlacas.stateChanged.connect(self.desactivar_placaB)
 
         self.buttonGuardarParamDetec.clicked.connect(self.guardar_datos_detection)
@@ -79,8 +80,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.buttonCancelarParamTemp.clicked.connect(self.cancelar_cambios_temp)
 
         self.buttonConfiguracionExper.clicked.connect(self.open_dialog)
-
-        self.buttonRecargar.clicked.connect(lambda index: self.filechooser("hola"))
 
         self.buttonCargar.clicked.connect(self.cargar_datos_experimento)
         self.buttonGuardar.clicked.connect(self.guardar_datos_experimento)
@@ -109,22 +108,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.dSpinBoxTempMax.valueChanged.connect(self.hSliderTempMax.setValue)
         self.dSpinBoxTempSet.valueChanged.connect(self.hSliderTempSet.setValue)
 
-        #self.buttonConectarTermo.clicked.connect(self.cargar_imagenes)
+        self.buttonRecargar.clicked.connect(lambda: self.filechooser(True))
+
 
         self.buttonParar.clicked.connect(self.pararExperimento)
 
         self.listExperimentos.itemDoubleClicked.connect(self.mostrar_nombre_experimento)
         self.sliderFotos.valueChanged.connect(self.actualizar_imagen)
 
-        #Aqui hay que setear de primeras las temperaturas de los liquidos
+        #Aqui hay que setear de primeras las temperaturas de los liquidos cuando podamos obtenerlas
         #self.pintar_grafica(temp_bloc, temp_liquid, temp_set)
 
 
         # Timer de la grafica
 
-        #self.timer = QTimer(self)
-        #self.timer.timeout.connect(self.actualizar_grafica)
-        #self.timer.start(1000)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.actualizar_grafica)
+        self.timer.start(1000)
 
         #SE AÑADE UN VALOR A LAS LISTAS DE DATO
 
@@ -133,10 +133,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.comboBoxFiltroAn.addItem("Crear un filtro nuevo ...")
         self.comboBoxFiltroAn.currentIndexChanged.connect(lambda index: self.comprobar_opcion_seleccionada(index, self.comboBoxFiltroAn))
-
-
-
- 
 
     def detener_timer(self):
         self.timer.stop()
@@ -236,37 +232,32 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def filechooser(self, folder = None):
         """Abre un diálogo para seleccionar una carpeta."""
         if not folder:
-            file_dialog = QFileDialog()
-            file_dialog.setFileMode(QFileDialog.FileMode.Directory)
-            if file_dialog.exec():
-                print(folder)
-                selected_folder = file_dialog.selectedFiles()
-                carpeta_seleccionada = selected_folder[0]
+            selected_folder = QFileDialog.getExistingDirectory(self)
+            if selected_folder:
+                carpeta_seleccionada = selected_folder
+            else:
+                carpeta_seleccionada = self.txtArchivos.text()  # Usar el valor anterior si se cancela
         else:
             carpeta_seleccionada = self.txtArchivos.text()
 
         self.txtArchivos.setText(carpeta_seleccionada)
         carpetas_sns = self.buscar_carpetas_sns(carpeta_seleccionada)
         
+        self.comboBoxFiltro.clear()
+        self.comboBoxFiltroAn.clear()
         if carpetas_sns:
-            if self.tabWidget.tabText(self.tabWidget.currentIndex()) == "Experimento":
-                if self.comboBoxFiltro.count() > 1:
-                    self.comboBoxFiltro.clear()
-                    self.comboBoxFiltro.addItem("Crear un filtro nuevo ...")
-                for carpeta in carpetas_sns:
-                    self.comboBoxFiltro.addItem(carpeta)
-            else:
-                if self.comboBoxFiltroAn.count() > 1:
-                    self.comboBoxFiltroAn.clear()
-                    self.comboBoxFiltroAn.addItem("Crear un filtro nuevo ...")
-                for carpeta in carpetas_sns:
-                    self.comboBoxFiltroAn.addItem(carpeta)
+            
+            self.comboBoxFiltro.addItem("Crear un filtro nuevo ...")
+            for carpeta in carpetas_sns:
+                self.comboBoxFiltro.addItem(carpeta)
+            for carpeta in carpetas_sns:
+                self.comboBoxFiltroAn.addItem(carpeta)
         else:
-            print("No se encontraron carpetas que empiecen por 'SNS' dentro de la carpeta seleccionada.")
+            QMessageBox.warning(self, "Alerta", "No se encontraron carpetas de filtros 'SNS' dentro de la carpeta seleccionada.")
 
     def comprobar_opcion_seleccionada(self, index, combobox):
         """Comprueba la opción seleccionada en el combobox de filtros."""
-        if index == 0:  
+        if index == 0 and combobox == self.comboBoxFiltro:  
             if(combobox.currentText() == None or combobox.currentText() == ""):
                 QMessageBox.warning(self, "Alerta", "Seleccione una carpeta para guardar los filtros antes de continuar.")
                 self.filechooser()
@@ -288,7 +279,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     self.rellenar_datos_temp(datos_temp)
             else:
                 carpetas = self.cargar_lista_experimentos(self.txtArchivos.text() + "/" + combobox.currentText())
-                print(carpetas)
 
 
     
@@ -697,12 +687,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     ######################## GRAFICA ####################################
 
     def actualizar_grafica(self):
-
-        #temperatura_bloque = [20, 25, 30, 28, 27, 26, 25, 24, 23, 22]
-        #temperatura_liquido = [22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
-        #temperatura_consigna = [25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
-        #self.pintar_grafica(temperatura_bloque, temperatura_liquido, temperatura_consigna)
-        print("hola")
+        # HAY QUE HACER QUE LEA LAS LISTAS Y QUE LAS LISTAS SE ACTUALICEN CONFORME SE TOMAN DATOS
+        temperatura_bloque = [20, 25, 30, 28, 27, 26, 25, 24, 23, 22]
+        temperatura_liquido = [22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
+        temperatura_consigna = [25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
+        self.pintar_grafica(temperatura_bloque, temperatura_liquido, temperatura_consigna)
     
     def pintar_grafica(self, temperatura_bloque, temperatura_liquido, temperatura_consigna):
         """Pinta una gráfica utilizando PyQtGraph y la muestra en un QGraphicsView."""
@@ -729,7 +718,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Ajustar el tamaño del proxy para que coincida con el plot_widget
         proxy.setPos(0, 0)
-        proxy.resize(self.graphicsView.width(), self.graphicsView.height())
+        proxy.resize(self.graphicsView.width() - 2, self.graphicsView.height() - 2)
 
         # Agregar el proxy al graphicsView
         self.graphicsView.scene().addItem(proxy)
@@ -864,7 +853,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if index is not None:
             if index == 0:
                 self.buttonIniciar.setEnabled(False)
-            elif index == 1 and self.checkBoxHabilitarA.isChecked():
+            elif index == 1 and (self.checkBoxHabilitarA.isChecked() or self.checkBoxAmbasPlacas.isChecked()):
                 self.buttonIniciar.setEnabled(True)
             elif index == 2 and self.checkBoxHabilitarB.isChecked():
                 self.buttonIniciar.setEnabled(True)
@@ -915,26 +904,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             os.makedirs(ruta_imagenes)
 
         datos_camara = self.leer_json_camara(self.obtener_ruta_json("camera.json"))
-        print("2")
         h1 = threading.Thread(name="guardado_imagenes", target=self.comprobar_fotos, args=(ruta_experimento_activo, datos_camara))
-        print("3")
         h1.start()
-        print("4")
 
 
     def comprobar_fotos(self, ruta_imagenes, datos_camara):
         global parar
-        print("!")
         while not parar:
-            print("entro en el bucle")
-            print(f"temperatura: {datos_camara['temp_set']}")
-            print(f"valor spinbox:{self.dSpinBoxTempSet.value()}")
             if (self.dSpinBoxTempSet.value() == datos_camara['temp_set']):
-                print("if")
                 time.sleep(int(datos_camara['frecuencia']))
                 self.thread.save(ruta_imagenes, self.tabWidget_2.tabText(self.tabWidget_2.currentIndex()), self.checkBoxAmbasPlacas.isChecked())
             else:
-                print("else")
                 time.sleep(int(datos_camara['frecuencia']))
 
 
@@ -1130,11 +1110,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             json.dump(datos_experimento, file)
 
         QMessageBox.information(self, "Guardado", "Los datos del experimento se han actualizado correctamente.", QMessageBox.StandardButton.Ok)
-
-
-
+        
     def cargar_imagenes(self):
-            
         # Ruta de la carpeta que contiene las imágenes
         carpeta_imagenes = self.txtArchivos.text() + "/" + self.comboBoxFiltroAn.currentText() + "/" + self.lblExperimentoSeleccionado.text() + "/imagenes"
 
@@ -1163,10 +1140,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             pixmap = pixmap.transformed(QTransform().rotate(90))
             
             # Crea una instancia de la clase Imagen y agrega a la lista
-            imagen = Imagen(imagen_nombre, pixmap, 0)  # Asegúrate de definir `temp` donde sea necesario
+            imagen = Imagen(imagen_nombre, pixmap, 0)  # CAMBIAR POR LA TEMPERATURA QUE TENGA EL LIQUIDO
             lista_imagenes_analisis.append(imagen)
-
-        print(len(lista_imagenes_analisis) - 1)
 
         self.sliderFotos.setMaximum(len(lista_imagenes_analisis) - 1) 
         
@@ -1203,7 +1178,6 @@ class VideoThread(QThread):
             if ret:
                 # Imprimir las dimensiones del fotograma
                 height, width, _ = cv_img.shape
-                #########print("Dimensiones del fotograma:", height, "x", width)
 
                 # Emitir la señal con el fotograma capturado
                 self.change_pixmap_signal.emit(cv_img)
