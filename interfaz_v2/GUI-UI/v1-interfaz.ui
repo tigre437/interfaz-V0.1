@@ -2053,14 +2053,14 @@
         <widget class="QLabel" name="labelCamara">
          <property name="minimumSize">
           <size>
-           <width>0</width>
-           <height>0</height>
+           <width>480</width>
+           <height>740</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>480</width>
-           <height>770</height>
+           <height>740</height>
           </size>
          </property>
          <property name="styleSheet">

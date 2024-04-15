@@ -62,7 +62,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.comboBoxCamara.currentIndexChanged.connect(self.update_camera_index)
         self.checkBoxHabilitarA.stateChanged.connect(self.cambiarPlacaA)
         self.checkBoxHabilitarB.stateChanged.connect(self.cambiarPlacaB)
-        self.comboBoxFiltro.currentIndexChanged.connect(lambda index: self.comprobar_opcion_seleccionada(index, self.comboBoxFiltro))
+        global check_option_lambda
+        check_option_lambda = lambda index: self.comprobar_opcion_seleccionada(index, self.comboBoxFiltro)
+        self.comboBoxFiltro.currentIndexChanged.connect(check_option_lambda)
         self.buttonGuardarFiltro.clicked.connect(self.guardar_datos_filtro)
         self.buttonCancelarFiltro.clicked.connect(self.cancelar_cambios_filtro)
         self.buttonIniciar.clicked.connect(self.iniciar_experimento)
@@ -122,9 +124,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Timer de la grafica
 
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.actualizar_grafica)
-        self.timer.start(1000)
+       #self.timer = QTimer(self)
+       #self.timer.timeout.connect(self.actualizar_grafica)
+       #self.timer.start(1000)
 
         #SE AÑADE UN VALOR A LAS LISTAS DE DATO
 
@@ -258,8 +260,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def comprobar_opcion_seleccionada(self, index, combobox):
         """Comprueba la opción seleccionada en el combobox de filtros."""
         if index == 0 and combobox == self.comboBoxFiltro:  
-            if(combobox.currentText() == None or combobox.currentText() == ""):
+            if(self.txtArchivos.text() == None or self.txtArchivos.text() == ""):
                 QMessageBox.warning(self, "Alerta", "Seleccione una carpeta para guardar los filtros antes de continuar.")
+                self.comboBoxFiltro.currentIndexChanged.disconnect(check_option_lambda)
+                self.comboBoxFiltro.setCurrentIndex(-1)
+                self.comboBoxFiltro.currentIndexChanged.connect(check_option_lambda)
                 self.filechooser()
             nombre_carpeta = self.obtener_nombre_carpeta()
             if nombre_carpeta:
@@ -344,8 +349,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             print(f"Carpeta '{nombre_carpeta_sns}' creada exitosamente en '{directorio_seleccionado}'.")
             carpetas_sns = self.buscar_carpetas_sns(directorio_seleccionado)
 
-            # Desconecta la señal currentIndexChanged temporalmente
-            self.comboBoxFiltro.currentIndexChanged.disconnect(self.comprobar_opcion_seleccionada)
+            self.comboBoxFiltro.currentIndexChanged.disconnect(check_option_lambda)
             self.comboBoxFiltro.clear()
             self.comboBoxFiltro.addItem("Crear un filtro nuevo ...")
             for carpeta in carpetas_sns:
@@ -354,12 +358,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
             # Crear el archivo filter.json
             self.crear_json_filtro(ruta_carpeta_sns)
-
+            
             # Cargar los datos del filtro recién creado
-            self.comprobar_opcion_seleccionada(1)  # Índice 1 para seleccionar el nuevo filtro
+            self.comprobar_opcion_seleccionada(1, self.comboBoxFiltro)  # Índice 1 para seleccionar el nuevo filtro
 
             # Vuelve a conectar la señal currentIndexChanged
-            self.comboBoxFiltro.currentIndexChanged.connect(self.comprobar_opcion_seleccionada)
+            self.comboBoxFiltro.currentIndexChanged.connect(check_option_lambda)
             
         else:
             print("Error: El directorio seleccionado no es válido.")
