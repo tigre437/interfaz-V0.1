@@ -118,6 +118,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.listExperimentos.itemDoubleClicked.connect(self.mostrar_nombre_experimento)
         self.sliderFotos.valueChanged.connect(self.actualizar_imagen)
 
+        self.buttonRecargar.clicked.connect(lambda index: self.filechooser(self.txtArchivos.text()))
+
         #Aqui hay que setear de primeras las temperaturas de los liquidos cuando podamos obtenerlas
         #self.pintar_grafica(temp_bloc, temp_liquid, temp_set)
 
@@ -133,7 +135,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         ######################  ANALISIS  ##########################
 
-        self.comboBoxFiltroAn.addItem("Crear un filtro nuevo ...")
         self.comboBoxFiltroAn.currentIndexChanged.connect(lambda index: self.comprobar_opcion_seleccionada(index, self.comboBoxFiltroAn))
 
     def detener_timer(self):
@@ -259,7 +260,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def comprobar_opcion_seleccionada(self, index, combobox):
         """Comprueba la opción seleccionada en el combobox de filtros."""
-        if index == 0 and combobox == self.comboBoxFiltro:  
+        if index == -1:
+            pass
+        elif index == 0 and combobox == self.comboBoxFiltro:  
             if(self.txtArchivos.text() == None or self.txtArchivos.text() == ""):
                 QMessageBox.warning(self, "Alerta", "Seleccione una carpeta para guardar los filtros antes de continuar.")
                 self.comboBoxFiltro.currentIndexChanged.disconnect(check_option_lambda)
