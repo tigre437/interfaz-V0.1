@@ -16,7 +16,7 @@ from pygrabber.dshow_graph import FilterGraph
 import datetime
 from configFotos import Ui_Dialog
 import threading  
-import lauda
+from lauda import Lauda
 from VideoThread import VideoThread
 
 
@@ -40,13 +40,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.dialog.ui.buttonBox.accepted.connect(self.guardar_datos_camara)
 
 
-        self.lauda = lauda.Lauda()
+        self.lauda = Lauda()
         self.video_thread = VideoThread(MainWindow)
 
         #self.video_thread.start()
         self.lauda.start()
-
-        self.lauda = lauda.Lauda()
 
         # Graficas
         scene = QtWidgets.QGraphicsScene()
@@ -557,7 +555,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             json.dump(datos_camara, file)
 
         # Informar al usuario que los datos han sido guardados correctamente
-        QtWidgets.QMessageBox.information(self, "Guardado", "Los datos de la cámara se han actualizado correctamente.", QtWidgets.QMessageBox.StandardButton.Ok)
+        QtWidgets.QMessageBox.information(self, "Guardado", "Los datos se han actualizado correctamente.", QtWidgets.QMessageBox.StandardButton.Ok)
 
 
 
@@ -888,14 +886,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     ####################### CAMARA ##############################
     
     def update_camera_index(self, index):
-        if self.thread and self.thread.isRunning():
-            self.thread.stop()  # Detener el hilo existente
-            self.thread.finished.connect(self.thread.deleteLater)  # Eliminar el objeto del hilo después de que termine
+        if self.video_thread and self.video_thread.isRunning():
+            self.video_thread.stop()  # Detener el hilo existente
+            self.video_thread.finished.connect(self.video_thread.deleteLater)  # Eliminar el objeto del hilo después de que termine
 
-        self.thread = VideoThread(MainWindow)
-        self.thread.change_pixmap_signal.connect(self.update_image)
-        self.thread.set_camera_index(index)
-        self.thread.start()
+        self.video_thread = VideoThread(MainWindow)
+        self.video_thread.change_pixmap_signal.connect(self.update_image)
+        self.video_thread.set_camera_index(index)
+        self.video_thread.start()
 
     def list_cameras(self):
         """Obtiene una lista de cámaras disponibles."""
@@ -916,7 +914,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.comboBoxCamara.addItem(camera_name)
 
     def settings(self):
-        self.thread.settings()
+        self.video_thread.settings()
 
     def save(self):
         global ruta_experimento_activo
@@ -938,7 +936,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         while not parar:
             if (self.dSpinBoxTempSet.value() == datos_camara['temp_set']):
                 time.sleep(int(datos_camara['frecuencia']))
-                self.thread.save(ruta_imagenes, self.tabWidget_2.tabText(self.tabWidget_2.currentIndex()), self.checkBoxAmbasPlacas.isChecked())
+                self.video_thread.save(ruta_imagenes, self.tabWidget_2.tabText(self.tabWidget_2.currentIndex()), self.checkBoxAmbasPlacas.isChecked())
             else:
                 time.sleep(int(datos_camara['frecuencia']))
 
