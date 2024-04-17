@@ -18,11 +18,15 @@ from configFotos import Ui_Dialog
 import threading  
 from lauda import Lauda
 from VideoThread import VideoThread
+import random
 
 
 ruta_experimento_activo = None
 parar = False
 lista_imagenes_analisis = []
+temp_bloc = [1,2,3,4,5,6,7,8,9]
+temp_liquid = [4,5,6,7,8,9,1,2,3]
+temp_set = [7,8,9,1,2,3,4,5,6]
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
     def __init__(self, *args, obj=None, **kwargs):
@@ -128,14 +132,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.buttonRecargar.clicked.connect(lambda index: self.filechooser(self.txtArchivos.text()))
 
         #Aqui hay que setear de primeras las temperaturas de los liquidos cuando podamos obtenerlas
-        #self.pintar_grafica(temp_bloc, temp_liquid, temp_set)
+        self.pintar_grafica(temp_bloc, temp_liquid, temp_set)
 
 
         # Timer de la grafica
 
-       #self.timer = QTimer(self)
-       #self.timer.timeout.connect(self.actualizar_grafica)
-       #self.timer.start(1000)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.actualizar_grafica)
+        
 
         #SE AÑADE UN VALOR A LAS LISTAS DE DATO
 
@@ -710,11 +714,29 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     ######################## GRAFICA ####################################
 
     def actualizar_grafica(self):
-        # HAY QUE HACER QUE LEA LAS LISTAS Y QUE LAS LISTAS SE ACTUALICEN CONFORME SE TOMAN DATOS
-        temperatura_bloque = [20, 25, 30, 28, 27, 26, 25, 24, 23, 22]
-        temperatura_liquido = [22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
-        temperatura_consigna = [25, 25, 25, 25, 25, 25, 25, 25, 25, 25]
-        self.pintar_grafica(temperatura_bloque, temperatura_liquido, temperatura_consigna)
+        global temp_bloc, temp_liquid, temp_set  # Declarando las variables como globales
+        
+        # Genera valores aleatorios para las temperaturas
+        nuevo_valor_bloque = random.randint(20, 30)
+        nuevo_valor_liquido = random.randint(22, 40)
+        nuevo_valor_consigna = random.randint(20, 30)  # Puedes cambiar el rango si lo necesitas
+        
+        # Añade el nuevo valor a cada lista de temperatura
+        temp_bloc.append(nuevo_valor_bloque)
+        temp_liquid.append(nuevo_valor_liquido)
+        temp_set.append(nuevo_valor_consigna)
+        
+        # Guardar los límites actuales de los ejes
+        xlim = self.plot_widget.getViewBox().state['viewRange'][0]
+        ylim = self.plot_widget.getViewBox().state['viewRange'][1]
+        
+        # Llama a la función pintar_grafica con las listas actualizadas
+        self.pintar_grafica(temp_bloc, temp_liquid, temp_set)
+        
+        # Restaurar los límites de los ejes
+        self.plot_widget.setXRange(*xlim, padding=0)
+        self.plot_widget.setYRange(*ylim, padding=0)
+
     
     def pintar_grafica(self, temperatura_bloque, temperatura_liquido, temperatura_consigna):
         """Pinta una gráfica utilizando PyQtGraph y la muestra en un QGraphicsView."""
@@ -734,6 +756,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.plot_widget.getAxis('left').setPen(pg.mkPen(color='w'))  # Color del eje y
         self.plot_widget.getAxis('bottom').setTextPen('w')  # Color de los números en el eje x
         self.plot_widget.getAxis('left').setTextPen('w')  # Color de los números en el eje y
+
+        # Agregar etiquetas a los ejes x e y
+        self.plot_widget.setLabel('bottom', text='timestamp (s)', color='w')  # Etiqueta del eje x
+        self.plot_widget.setLabel('left', text='temperature (ºC)', color='w')  # Etiqueta del eje y
+
+        # Mostrar la leyenda
+        self.plot_widget.addLegend()
 
         # Crear un proxy widget para el plot_widget
         proxy = QGraphicsProxyWidget()
@@ -799,6 +828,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def iniciar_experimento(self):
         datos_filtro = self.leer_json_filtro(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "filter.json"))
         datos_detection = self.leer_json_detection(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "detection.json"))
+        datos_camara = self.leer_json_camara(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "camera.json"))
+
+        self.lauda.set_t_set(int(datos_camara['temp_set']))
+        self.lauda.start()
+        
+
         placa = self.tabWidget_2.tabText(self.tabWidget_2.currentIndex())
         if (placa == "Placa A"):
             datos_exper = {
@@ -844,6 +879,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         datos_experimento.update(datos_filtro)
         datos_experimento.update(datos_detection)
         datos_experimento.update(datos_exper)
+
+        self.timer.start(int(self.leer_json_camara(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "camera.json"))['frecuencia'])*1000)
 
         with open(ruta_json, 'w') as file:
             json.dump(datos_experimento, file)

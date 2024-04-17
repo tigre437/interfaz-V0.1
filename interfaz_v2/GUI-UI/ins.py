@@ -8,8 +8,8 @@ import datetime as dt
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from lib import camera
-from lib import lauda
+from camera import Camera
+from lauda import Lauda
 import yaml
 
 DATA_PATH = 'data'
@@ -52,8 +52,8 @@ def update_plot(lines, data, steptime):
 
 class Ins():
     def __init__(self, thermostat_port=None, camera_port=None, image_shape=[1280, 960], steptime=5):
-        self.thermostat = lauda.Lauda(url=thermostat_port)
-        self.camera = camera.Camera(port=camera_port, shape=image_shape)
+        self.thermostat = Lauda(url=thermostat_port)
+        self.camera = Camera(port=camera_port, shape=image_shape)
 
         self.steptime = steptime
         self.experiment_name = None
