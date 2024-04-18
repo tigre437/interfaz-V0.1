@@ -1414,7 +1414,7 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="tab_3">
              <attribute name="title">
@@ -1549,6 +1549,12 @@
                            <width>130</width>
                            <height>16777215</height>
                           </size>
+                         </property>
+                         <property name="minimum">
+                          <number>0</number>
+                         </property>
+                         <property name="maximum">
+                          <number>99</number>
                          </property>
                          <property name="singleStep">
                           <number>1</number>
@@ -1815,6 +1821,9 @@
                            <height>16777215</height>
                           </size>
                          </property>
+                         <property name="minimum">
+                          <number>-99</number>
+                         </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
                          </property>
@@ -1857,6 +1866,9 @@
                            <height>16777215</height>
                           </size>
                          </property>
+                         <property name="minimum">
+                          <number>-99</number>
+                         </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
                          </property>
@@ -1898,6 +1910,9 @@
                            <width>130</width>
                            <height>16777215</height>
                           </size>
+                         </property>
+                         <property name="minimum">
+                          <number>-99</number>
                          </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>

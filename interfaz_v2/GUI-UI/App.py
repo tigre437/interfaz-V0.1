@@ -131,17 +131,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.buttonRecargar.clicked.connect(lambda index: self.filechooser(self.txtArchivos.text()))
 
-        #Aqui hay que setear de primeras las temperaturas de los liquidos cuando podamos obtenerlas
         self.pintar_grafica(temp_bloc, temp_liquid, temp_set)
 
 
         # Timer de la grafica
-
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.actualizar_grafica)
         
-
-        #SE AÑADE UN VALOR A LAS LISTAS DE DATO
 
 
         ######################  ANALISIS  ##########################
@@ -170,7 +166,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Rellenar los campos del diálogo con los datos de la cámara
         self.dialog.ui.labelFrecuencia.setText(str(datos_camara['frecuencia']))
-        self.dialog.ui.checkBox.setChecked(datos_camara['habilitado'])
         self.dialog.ui.doubleSpinTemp.setValue(datos_camara['temp_set'])
 
         # Mostrar el diálogo
@@ -391,7 +386,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.lauda.open(url)
 
 
-
     ######################### JSON #################################
 
     def leer_json_filtro(self, archivo_json):
@@ -521,7 +515,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def rellenar_datos_camara(self, datos):
         """Asigna los valores correspondientes a cada campo de texto."""
         self.labelFrecuencia.setText(str(datos['frecuencia']))
-        self.checkBox.setChecked(datos['habilitado'])
         self.doubleSpinTemp.setValue(datos['temp_set'])
 
     def crear_json_camara(self, ruta_carpeta_sns):
@@ -541,13 +534,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         """Guarda los datos de la cámara en un archivo JSON."""
         # Obtener los datos de los campos de texto del diálogo
         frecuencia = self.dialog.ui.labelFrecuencia.text()
-        habilitado = self.dialog.ui.checkBox.isChecked()
         temp_set = self.dialog.ui.doubleSpinTemp.value()
 
         # Crear un diccionario con los datos
         datos_camara = {
             'frecuencia': frecuencia,
-            'habilitado': habilitado,
             'temp_set': temp_set
         }
 
@@ -826,14 +817,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         return ruta_experimento
 
     def iniciar_experimento(self):
+        # Leer datos del filtro, detección y cámara desde archivos JSON
         datos_filtro = self.leer_json_filtro(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "filter.json"))
         datos_detection = self.leer_json_detection(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "detection.json"))
         datos_camara = self.leer_json_camara(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "camera.json"))
 
+        # Configurar la temperatura objetivo y iniciar el dispositivo Lauda
         self.lauda.set_t_set(int(datos_camara['temp_set']))
         self.lauda.start()
-        
 
+        # Obtener los datos del experimento dependiendo de la placa seleccionada
         placa = self.tabWidget_2.tabText(self.tabWidget_2.currentIndex())
         if (placa == "Placa A"):
             datos_exper = {
@@ -856,15 +849,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 "observations_exp": self.txtObservPlacaB.toPlainText()
             }
         
+        # Obtener la ruta de la carpeta del experimento
         ruta_carpeta_experimento = self.obtener_ruta_experimento()
 
-        # Verificar si la carpeta del experimento ya existe
+        # Verificar si la carpeta del experimento ya existe, si no, crearla
         if not os.path.exists(ruta_carpeta_experimento):
-            os.makedirs(ruta_carpeta_experimento)  # Crear la carpeta del experimento si no existe
+            os.makedirs(ruta_carpeta_experimento)
 
         global ruta_experimento_activo
         ruta_experimento_activo = ruta_carpeta_experimento
 
+        # Obtener la ruta del archivo JSON del experimento
         ruta_json = self.obtener_ruta_experimento_json()
 
         # Verificar si el archivo JSON ya existe y eliminarlo si es así
@@ -875,24 +870,50 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             else:
                 os.remove(ruta_json)
         
+        # Combinar todos los datos del experimento en un solo diccionario
         datos_experimento = {}
         datos_experimento.update(datos_filtro)
         datos_experimento.update(datos_detection)
         datos_experimento.update(datos_exper)
 
-        self.timer.start(int(self.leer_json_camara(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "camera.json"))['frecuencia'])*1000)
+        # Iniciar el temporizador para la gráfica
+        self.timer.start(int(self.leer_json_camara(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "camera.json"))['frecuencia']) * 1000)
 
+        # Guardar los datos del experimento en el archivo JSON
         with open(ruta_json, 'w') as file:
             json.dump(datos_experimento, file)
 
+        # Habilitar el botón de parar experimento
         self.buttonParar.setEnabled(True)
+
+        # Configurar la variable global 'parar' para indicar que el experimento está en marcha
         global parar
         parar = False
+
+        datos_temp = self.leer_json_temp(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "temp.json"))
+
+        # Guardar la configuración actual
         self.save()
+        self.rampa_temperatura(datos_temp['temp_min'])
+        self.guardar_temperaturas()
+
 
     def pararExperimento(self):
+        Lauda.stop()
         global parar
         parar = True
+
+    def rampa_temperatura(self, objetivo):
+        while not parar:
+            if(Lauda.get_t_int > objetivo):
+                Lauda.set_t_set(Lauda.get_t_int - 1)
+
+    def guardar_temperaturas(self):
+        while not parar:
+            time.sleep((self.leer_json_camara(os.path.join(self.txtArchivos.text(), self.comboBoxFiltro.currentText(), "camera.json"))['frecuencia']) * 1000)
+            temp_bloc.append(Lauda.get_t_ext)
+            temp_liquid.append(Lauda.get_t_int)
+            temp_set.append(Lauda.get_t_set)
 
 
     def mostrar_dialogo_confirmacion(self, titulo, mensaje):
@@ -971,9 +992,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def comprobar_fotos(self, ruta_imagenes, datos_camara):
         global parar
         while not parar:
-            if (self.dSpinBoxTempSet.value() == datos_camara['temp_set']):
-                time.sleep(int(datos_camara['frecuencia']))
+            if (Lauda.get_t_int == datos_camara['temp_set']):
                 self.video_thread.save(ruta_imagenes, self.tabWidget_2.tabText(self.tabWidget_2.currentIndex()), self.checkBoxAmbasPlacas.isChecked())
+                time.sleep(int(datos_camara['frecuencia']))
             else:
                 time.sleep(int(datos_camara['frecuencia']))
 

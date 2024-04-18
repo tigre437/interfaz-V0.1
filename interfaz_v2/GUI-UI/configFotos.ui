@@ -84,6 +84,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
            <widget class="QLabel" name="label_2">
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
              <string>Temperatura de inicio:</string>
             </property>
@@ -103,18 +109,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBox">
+           <widget class="QLabel" name="label_4">
             <property name="maximumSize">
              <size>
-              <width>86</width>
+              <width>25</width>
               <height>16777215</height>
              </size>
             </property>
-            <property name="toolTip">
-             <string extracomment="Si se desactiva se empezaran a hacer fotos cuando se inicie el experimento"/>
-            </property>
             <property name="text">
-             <string>Desactivado</string>
+             <string>ºC</string>
             </property>
            </widget>
           </item>
